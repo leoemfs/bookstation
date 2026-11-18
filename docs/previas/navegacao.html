@@ -95,12 +95,19 @@ svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke
 .seg button{flex:1;border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:10px;padding:7px 4px;font-size:12px;cursor:pointer;font-family:var(--f-ui)}
 .seg button.on{color:var(--accent);border-color:rgb(224 168 74 / .45)}
 .toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);z-index:9;background:var(--text);color:var(--bg);padding:9px 14px;border-radius:12px;font-size:13px;white-space:nowrap}
+.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.tag{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--raised);color:var(--muted)}
+.tag.ai{background:rgb(196 165 253 / .15);color:var(--violet)}
+.export{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;font-size:12px;line-height:1.5;color:var(--muted);white-space:pre-wrap;max-height:210px;overflow:auto;margin:14px 0 0;font-family:ui-monospace,Menlo,monospace}
+.btn{border:0;border-radius:14px;padding:13px;font:600 14px var(--f-ui);background:var(--accent);color:var(--on-accent);cursor:pointer}
+.btn.ghost{background:var(--raised);color:var(--text)}
+.soon{display:flex;flex-direction:column;gap:4px;border-style:dashed;cursor:default}
 button:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="wrap">
-  <p class="note"><b>Prévia de navegação (exemplo, sem dados reais).</b> Toque nos cartões, nas abas da barra e no <b>+</b> do meio: as ações mudam conforme a tela.</p>
+  <p class="note"><b>Prévia de navegação v2 (exemplo, sem dados reais).</b> Toque nos cartões, nas abas da barra e no <b>+</b> do meio: as ações mudam conforme a tela.</p>
   <div class="phone" id="phone">
     <header class="top">
       <button class="ib back" id="back" aria-label="Voltar" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -135,21 +142,24 @@ const I={
  hand:'<path d="M4 18c3 0 4-8 7-8s1 6 4 6 3-4 5-4"/>',
  line:'<path d="M4 12h16"/>',
  upload:'<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+ send:'<path d="M4 12l16-8-6 16-2.5-6.5z"/><path d="M11.5 13.5L20 4"/>',
+ dots:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
  star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
 };
 const ic=(n)=>`<svg viewBox="0 0 24 24">${I[n]}</svg>`;
 
 const BOOK='A Estação das Marés';
-const BAR_LIB=[['lib','Biblioteca','lib'],['search','Buscar','busca'],null,['bulb','Ideias','ideiasGerais'],['trash','Lixeira','lixeira']];
+const BAR_LIB=[['lib','Biblioteca','lib'],['bulb','Ideias','ideiasGerais'],null,['send','Publicar','publicar'],['dots','A definir','definir']];
 const BAR_BOOK=[['home','Painel','painel'],['list','Capítulos','capitulos'],null,['user','Fichas','fichas'],['bulb','Ideias','ideias']];
-const BAR_ED=[['list','Capítulos','capitulos'],['user','Fichas','fichas'],null,['ai','Contexto IA','ia'],['read','Ler','leitor']];
+const BAR_ED=[['list','Capítulos','capitulos'],['user','Fichas','fichas'],null,['copy','Copiar p/ IA','ia'],['read','Ler','leitor']];
 
 const PLUS={
  lib:{t:'Criar na Biblioteca',a:[['lib','Novo livro'],['bulb','Ideia solta'],['upload','Importar backup']]},
  painel:{t:'Criar em '+BOOK,a:[['bulb','Ideia rápida'],['list','Capítulo'],['draft','Rascunho'],['user','Personagem'],['pin','Local'],['img','Imagem'],'sep',['star','Categorias']]},
  capitulos:{t:'Criar em Capítulos',a:[['list','Capítulo'],['scene','Cena'],['draft','Rascunho'],'sep',['star','Categorias']]},
  fichas:{t:'Criar em Fichas',a:[['user','Personagem'],['pin','Local'],['cloud','Clima'],['link','Relação'],['compass','Objeto ou evento'],'sep',['star','Categorias']]},
- ideias:{t:'Captura rápida',a:[['bulb','Ideia'],['pen','Diálogo'],['scene','Possível cena']]},
+ ideias:{t:'Captura rápida',a:[['bulb','Ideia'],['pen','Diálogo'],['scene','Possível cena'],['ai','Ideia p/ cocriar com IA'],'sep',['star','Tags']]},
  editor:{t:'Inserir no capítulo',a:[['user','Personagem'],['pin','Local'],['cloud','Clima'],['scene','Nova cena'],['hand','Bloco manuscrito'],['line','Separador'],['img','Imagem de referência'],['draft','Trazer rascunho'],['bulb','Ideia rápida']]},
 };
 
@@ -159,7 +169,7 @@ const $=(id)=>document.getElementById(id);
 const SCREENS={
  lib:{title:()=>'<b>BookStation</b>',bar:BAR_LIB,on:'lib',plus:'lib',html:()=>`
   <h1 class="h">Biblioteca</h1>
-  <div class="row"><span class="chip on">Todos 3</span><span class="chip">Em escrita</span><span class="chip">Planejamento</span><span class="chip">Revisão</span><span class="chip">Arquivados</span></div>
+  <div class="row"><span class="chip on">Todos 3</span><span class="chip">Em escrita</span><span class="chip">Planejamento</span><span class="chip">Revisão</span><span class="chip">Arquivados</span><span class="chip" data-go="lixeira">Lixeira</span></div>
   <div class="lbl">Ordenar: última edição</div>
   <div class="stack">
    ${bookCard(BOOK,'Fantasia · Mistério','Uma cidade costeira onde o mar recua um pouco a cada noite, e alguém sabe por quê.','hoje, 09:14 · 12 capítulos','Em escrita','p-esc','#1d4e5f,#0e2a33',true)}
@@ -199,25 +209,49 @@ const SCREENS={
   <div class="stack">${person('Padre Anselmo','Participação · capela do cais','Cap. 4','#3d4f7a')}</div>`},
  ideias:{title:()=>`<span>${BOOK} / </span><b>Ideias</b>`,bar:BAR_BOOK,on:'ideias',plus:'ideias',html:()=>`
   <div class="card" style="cursor:text"><div class="meta">Escreva e pronto. Organiza depois.</div><div style="margin-top:8px;color:var(--faint)">Uma frase, um diálogo, uma virada…</div></div>
+  <div class="lbl">Filtrar por tag</div>
+  <div class="row"><span class="chip on">Todas 7</span><span class="chip">Cocriação IA</span><span class="chip">Diálogo</span><span class="chip">Reviravolta</span><span class="chip">Cena</span></div>
   <div class="lbl">Para organizar · 7</div>
   <div class="stack">
-   ${idea('“O mar não leva, ele guarda.” — frase da Iracema','há 2 h')}
-   ${idea('E se o Tomé for filho do antigo faroleiro?','ontem')}
-   ${idea('Cena: Lia acha o caderno molhado debaixo do assoalho','12/11')}
+   ${idea('“O mar não leva, ele guarda.” — frase da Iracema','há 2 h',['Diálogo'])}
+   ${idea('E se o Tomé for filho do antigo faroleiro? Pedir à IA 3 jeitos de revelar isso.','ontem',['Cocriação IA','Reviravolta'])}
+   ${idea('Cena: Lia acha o caderno molhado debaixo do assoalho','12/11',['Cena'])}
   </div>`},
  ideiasGerais:{title:()=>`<span>Biblioteca / </span><b>Ideias soltas</b>`,bar:BAR_LIB,on:'ideiasGerais',plus:'lib',html:()=>`
   <div class="sub">Ideias que ainda não têm livro.</div>
-  <div class="stack">${idea('Um livro contado só por listas de compras','03/11')}${idea('Cidade onde ninguém pode dizer “amanhã”','28/10')}</div>`},
- busca:{title:()=>`<span>Biblioteca / </span><b>Buscar</b>`,bar:BAR_LIB,on:'busca',plus:'lib',html:()=>`<div class="card" style="cursor:text;color:var(--faint)">Buscar em livros, capítulos, fichas…</div><div class="lbl">Recentes</div><div class="row"><span class="chip">Iracema</span><span class="chip">farol</span><span class="chip">neblina</span></div>`},
- lixeira:{title:()=>`<span>Biblioteca / </span><b>Lixeira</b>`,bar:BAR_LIB,on:'lixeira',plus:'lib',html:()=>`<div class="sub">Itens excluídos ficam aqui por 30 dias.</div><div class="stack">${idea('Livro: “Rascunho sem nome”','excluído em 15/11 · Recuperar')}</div>`},
- ia:{title:()=>`<span>Cap. 7 / </span><b>Contexto para IA</b>`,bar:BAR_ED,on:'ia',plus:'editor',html:()=>`
-  <div class="sub">Junta o guia do livro e as fichas escolhidas num texto para copiar.</div>
-  <div class="lbl">Incluir</div>
-  <div class="row"><span class="chip on">Guia do livro</span><span class="chip on">Iracema</span><span class="chip on">Lia</span><span class="chip">Tomé</span><span class="chip on">Farol</span></div>
-  <div class="lbl">O que quer trabalhar?</div>
-  <div class="card" style="cursor:text;color:var(--muted)">Quero três jeitos de terminar a cena do farol sem revelar o segredo.</div>
-  <div class="lbl">Depois</div>
-  <div class="card"><b style="font-size:14px">Colar resposta como rascunho</b><div class="meta">Nunca substitui o texto do capítulo.</div></div>`},
+  <div class="stack">${idea('Um livro contado só por listas de compras','03/11',['Premissa'])}${idea('Cidade onde ninguém pode dizer “amanhã”: testar com a IA se a regra se sustenta','28/10',['Cocriação IA','Premissa'])}</div>`},
+ busca:{title:()=>`<span>Biblioteca / </span><b>Buscar</b>`,bar:BAR_LIB,on:null,plus:'lib',html:()=>`<div class="card" style="cursor:text;color:var(--faint)">Buscar em livros, capítulos, fichas…</div><div class="lbl">Recentes</div><div class="row"><span class="chip">Iracema</span><span class="chip">farol</span><span class="chip">neblina</span></div>`},
+ lixeira:{title:()=>`<span>Biblioteca / </span><b>Lixeira</b>`,bar:BAR_LIB,on:'lib',plus:'lib',html:()=>`<div class="sub">Itens excluídos ficam aqui por 30 dias.</div><div class="stack">${idea('Livro: “Rascunho sem nome”','excluído em 15/11 · Recuperar')}</div>`},
+ ia:{title:()=>`<span>Cap. 7 / </span><b>Copiar para IA</b>`,bar:BAR_ED,on:'ia',plus:'editor',html:()=>`
+  <div class="sub">Gera um texto simples para colar no chat da IA (ChatGPT, Claude…). A resposta volta como rascunho.</div>
+  <div class="lbl">O que copiar</div>
+  <div class="row"><span class="chip on">Este capítulo</span><span class="chip">Capítulos 5 a 7</span><span class="chip">Livro inteiro</span></div>
+  <div class="lbl">Incluir junto</div>
+  <div class="row"><span class="chip on">Guia do livro</span><span class="chip on">Fichas citadas (3)</span><span class="chip">Resumos dos anteriores</span></div>
+  <div class="lbl">Pedido pronto</div>
+  <div class="row"><span class="chip on">Coerência</span><span class="chip">Continuidade</span><span class="chip">Correção</span><span class="chip">Estilo</span><span class="chip">Livre</span></div>
+  <pre class="export">Analise a COERÊNCIA do capítulo abaixo: contradições com as fichas, fatos, datas e o tom do livro. Liste os problemas com o trecho e uma sugestão. Não reescreva o capítulo.
+
+# Livro: A Estação das Marés
+Gênero: fantasia, mistério · Narrador: 3ª pessoa · Tom: melancólico
+
+## Fichas
+- Iracema Duarte: faroleira, 64 anos, olhos cinza…
+- Lia: neta de Iracema, 12 anos…
+
+## Capítulo 7 · A maré que não voltou
+Naquela manhã o mar não voltou. Iracema contou as estacas…</pre>
+  <div class="meta" style="margin:8px 2px">≈ 2.300 palavras · cabe em qualquer chat</div>
+  <div class="stack" style="margin-top:10px">
+   <button class="btn" data-copy>Copiar texto</button>
+   <button class="btn ghost" data-act="Colar resposta como rascunho">Colar resposta como rascunho</button>
+  </div>
+  <div class="card soon" style="margin-top:14px"><span class="pill p-plan">Em breve</span><b style="font-size:14px">IA dentro do app</b><div class="meta">Pedir e receber sem sair do BookStation.</div></div>`},
+ publicar:{title:()=>`<span>Biblioteca / </span><b>Publicar</b>`,bar:BAR_LIB,on:'publicar',plus:'lib',html:()=>`
+  <div class="card soon"><span class="pill p-plan">Em breve</span><h3 style="font-family:var(--f-book);margin:8px 0 4px">Comunidade de leitura</h3><div class="meta">Publique capítulos dos seus livros e leia autores de todo lugar, com virada de página.</div></div>
+  <div class="lbl">Como vai ser</div>
+  <div class="stack">${idea('Você escolhe o livro e os capítulos. Sobe uma cópia daquele momento; o texto de trabalho continua privado.','')}${idea('Leitores veem a capa em cartões, entram e leem os capítulos publicados.','')}</div>`},
+ definir:{title:()=>`<span>Biblioteca / </span><b>A definir</b>`,bar:BAR_LIB,on:'definir',plus:'lib',html:()=>`<div class="card soon"><b style="font-size:14px">Espaço livre na barra</b><div class="meta">Vamos decidir juntos o que entra aqui.</div></div>`},
  leitor:{title:()=>`<span>${BOOK} / </span><b>Leitura</b>`,bar:BAR_ED,on:'leitor',plus:'editor',html:()=>`
   <div class="paper old" style="min-height:420px"><div style="text-align:center;font-size:12px;opacity:.6;margin-bottom:18px">CAPÍTULO 7</div><h2 style="text-align:center">A maré que não voltou</h2><p>Naquela manhã o mar não voltou. Iracema contou as estacas do cais duas vezes, como quem conta os dedos depois de um susto…</p><div style="text-align:center;font-size:12px;opacity:.6;margin-top:30px">87 de 214 · 41%</div></div>
   <div class="sub" style="margin-top:12px;text-align:center">Deslize para virar a página</div>`},
@@ -241,7 +275,7 @@ function bookCard(t,g,d,m,s,cls,col,main){return `<div class="card book" tabinde
 function tile(i,t,s,go){return `<div class="card tile" tabindex="0" data-go="${go}"><div class="ic">${ic(i)}</div><b>${t}</b><small>${s}</small></div>`}
 function chap(n,t,m,s,cls,go){return `<div class="card chap" tabindex="0" data-go="${go||''}"><div class="num">${n}</div><div class="info"><h4>${t}</h4><div class="meta">${m}</div></div><span class="pill ${cls}">${s}</span><span class="drag">⋮⋮</span></div>`}
 function person(n,r,refs,c){return `<div class="card person" tabindex="0"><div class="av" style="background:${c}">${n[0]}</div><div style="min-width:0"><h4>${n}</h4><div class="meta">${r}</div><div class="refs">Aparece em: ${refs}</div></div></div>`}
-function idea(t,w){return `<div class="card"><div style="font-size:14.5px;line-height:1.45">${t}</div><div class="meta" style="margin-top:6px">${w}</div></div>`}
+function idea(t,w,tags){return `<div class="card"><div style="font-size:14.5px;line-height:1.45">${t}</div><div class="tags">${(tags||[]).map(g=>`<span class="tag${g==='Cocriação IA'?' ai':''}`+'">'+g+'</span>').join('')}<span class="meta">${w}</span></div></div>`}
 
 function render(){
   const k=stack[stack.length-1], s=SCREENS[k];
@@ -256,12 +290,13 @@ function go(k){ if(!k||!SCREENS[k])return; plusOpen=false; stack.push(k); render
 function tab(k){ plusOpen=false; const base=SCREENS[k].bar===BAR_LIB?['lib']:['lib','painel']; stack= k==='lib'?['lib']: k==='painel'?['lib','painel']: SCREENS[stack[stack.length-1]].bar===BAR_ED&&SCREENS[k].bar===BAR_ED?[...stack.slice(0,-1),k]:[...base,k]; if(stack[stack.length-2]===k)stack.pop(); render(); }
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;$('phone').appendChild(e);setTimeout(()=>e.remove(),1600)}
 $('back').onclick=()=>{plusOpen=false;stack.pop();render()};
-$('srch').onclick=()=>toast('Busca dentro de '+(stack.length>1?BOOK:'toda a Biblioteca'));
+$('srch').onclick=()=>go('busca');
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-go],[data-tab],#plus,#shade,[data-act],[data-p],.ref');
+  const t=e.target.closest('[data-copy],[data-go],[data-tab],#plus,#shade,[data-act],[data-p],.ref');
   if(!t)return;
   if(t.id==='plus'){plusOpen=!plusOpen;render();return}
   if(t.id==='shade'){plusOpen=false;render();return}
+  if(t.dataset.copy!==undefined){toast('Texto copiado. Cole no chat da IA.');return}
   if(t.dataset.act){plusOpen=false;render();toast('Abriria: '+t.dataset.act);return}
   if(t.dataset.p){paper=t.dataset.p;$('paper').className='paper '+paper;render();return}
   if(t.classList.contains('ref')){toast('Abre o resumo da ficha de '+t.textContent);return}
