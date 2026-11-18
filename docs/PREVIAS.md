@@ -7,6 +7,7 @@
 | 18/11/2026 | P3: editor completo | https://claude.ai/artifact/E8cZSQG26QuA3BWShxnCKi | `docs/previas/editor.html` | v1 aguardando opinião |
 | 18/11/2026 | P4: capítulos, cenas e rascunhos | https://claude.ai/artifact/Fju1XY1PfuHYsenzch2r8t | `docs/previas/capitulos.html` | v1 aguardando opinião |
 | 18/11/2026 | P5: fichas | https://claude.ai/artifact/UDfj9Yo4psMvAvL6gx52qj | `docs/previas/fichas.html` | v1 aguardando opinião |
+| 18/11/2026 | P6: leitor do livro | https://claude.ai/artifact/TxusD6ABSfWRdgtYYPYix6 | `docs/previas/leitor.html` | v1 aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -67,3 +68,14 @@
 - **Clima:** dois blocos separados, **Clima (o tempo)** e **Atmosfera (o sentimento)**, e onde é usado.
 - **Imagens:** galeria por categoria; ao abrir: descrição, tags, ligações e **Usar como referência ao escrever** (fica num cantinho do editor).
 - **Relações:** lista de pares com tipo; o mapa gráfico fica para a F9. Nova relação aparece nas duas fichas.
+
+## P6: leitor do livro (v1)
+- **Páginas de verdade:** o texto é dividido em páginas conforme o tamanho da tela, da fonte e das margens (muda ao ajustar).
+  Cada capítulo começa numa página nova, com "CAPÍTULO N", título e letra capitular.
+- **Virar:** tocar na borda direita/esquerda ou deslizar. Dica das zonas aparece nos primeiros segundos.
+  Animação: **Folhear** (a página gira pela lombada), **Deslizar** ou **Sem animação** (automática se o aparelho pede menos movimento).
+- Tela limpa: só o nome do livro/capítulo no alto e "página X de Y" embaixo. **Tocar no meio** mostra os controles.
+- **Controles:** voltar, índice (capítulos + marcadores), marcador da página, **Aa**; embaixo, régua para pular páginas,
+  "página do capítulo" e "% do livro", **Editar este trecho** e Copiar p/ IA.
+- **Aa:** cor da página (branca, papel antigo, preta), fonte, tamanho, margens, entrelinhas, alinhamento, tipo de virada.
+- Sem barra de baixo do app: a leitura ocupa a tela toda.
