@@ -2,7 +2,7 @@
 
 | Data | Prévia | Link | Arquivo | Situação |
 |---|---|---|---|---|
-| 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 vista; **v2** (mesmo link) aguardando opinião |
+| 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 e v2 vistas; **v3** (mesmo link) aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -14,3 +14,4 @@
 - Editor no modelo do CP Hub (2 linhas + Mais), cor da página (branca, preta, papel antigo),
   bloco manuscrito, referências sublinhadas e menu do `/`.
 - v2: ideias com tags ("Cocriação IA" em destaque) e filtro por tag; tela Copiar para IA com pedido pronto e texto para colar; telas "Em breve".
+- v3: dois ambientes. Botão Comunidade na Biblioteca troca a barra (Início · Descobrir · Feed · Salvos · Perfil) e a cor; feed de prévias (imagem + trecho, curtir, salvar, ler); nova prévia; leitura com virada de página; barra de baixo se recolhe ao rolar.

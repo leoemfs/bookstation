@@ -28,12 +28,14 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 ## Caixa de entrada
 - Gmail só para os apps (dono dos projetos Google Cloud, conta da IA e servidor). Um projeto Google por app.
 - Decidir o 5º botão da barra da Biblioteca (hoje "A definir").
+- Personalização das barras: barra de baixo que se recolhe ao rolar (opção liga/desliga). A de cima fica fixa.
 
 ## Decisões (18/11/2026)
 - Barra da Biblioteca: Biblioteca · Ideias · **+** · Publicar · (a definir). Lixeira saiu da barra e virou filtro dentro da Biblioteca. Busca fica na lupa do topo.
 - Comunidade (Publicar) e IA dentro do app aparecem como **"Em breve"**.
 - No editor, o botão de IA virou **Copiar p/ IA** (funciona sem servidor).
 - Branch `main` criado.
+- Comunidade é um **segundo ambiente**: barra própria (Início · Descobrir · Feed · Salvos · Perfil), cor violeta, feed de prévias com curtir e salvar (prévia v3).
 
 ## Feito
 - F0: documentação inicial e prévia geral (18/11/2026).

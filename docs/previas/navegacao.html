@@ -102,12 +102,35 @@ svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke
 .btn{border:0;border-radius:14px;padding:13px;font:600 14px var(--f-ui);background:var(--accent);color:var(--on-accent);cursor:pointer}
 .btn.ghost{background:var(--raised);color:var(--text)}
 .soon{display:flex;flex-direction:column;gap:4px;border-style:dashed;cursor:default}
+.phone.com{--accent:#b79cff;--accent-soft:rgb(183 156 255 / .14);--on-accent:#140d26}
+.bar{transition:transform .25s ease}
+.bar.hide{transform:translateY(130%)}
+.bar .plus.here{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+.post{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.ph{display:flex;gap:10px;align-items:center;padding:12px}
+.ph b{font-size:14px}
+.av.sm{width:36px;height:36px;border-radius:12px;font-size:16px}
+.art{aspect-ratio:4/5;max-width:100%;display:flex;align-items:flex-end;padding:22px;position:relative}
+.art::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,rgb(255 255 255 / .12),transparent 55%)}
+.quote{position:relative;z-index:1;font-family:var(--f-book);font-size:21px;line-height:1.4;color:#fff;text-wrap:balance;text-shadow:0 2px 12px rgb(0 0 0 / .4);outline:none}
+.pa{display:flex;align-items:center;gap:4px;padding:8px 10px}
+.lk{display:flex;align-items:center;gap:5px;background:none;border:0;color:var(--muted);padding:8px;border-radius:10px;font:500 13px var(--f-ui);cursor:pointer}
+.lk.on{color:var(--accent)} .lk.on svg{fill:currentColor}
+.rd{margin-left:auto;background:var(--accent-soft);color:var(--accent);border:0;border-radius:12px;padding:9px 14px;font:600 13px var(--f-ui);cursor:pointer}
+.shelf{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.cv{display:flex;flex-direction:column;gap:4px;cursor:pointer;min-width:0}
+.cv b{font-size:13.5px} .cv small{color:var(--muted);font-size:12px}
+.flipbox{perspective:1400px}
+.page{min-height:400px;transform-origin:left center}
+.turn-f{animation:tf .46s ease} .turn-b{animation:tb .46s ease}
+@keyframes tf{0%{transform:rotateY(0)}50%{transform:rotateY(-80deg);filter:brightness(.7)}100%{transform:rotateY(0)}}
+@keyframes tb{0%{transform:rotateY(0)}50%{transform:rotateY(80deg);filter:brightness(.7)}100%{transform:rotateY(0)}}
 button:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="wrap">
-  <p class="note"><b>Prévia de navegação v2 (exemplo, sem dados reais).</b> Toque nos cartões, nas abas da barra e no <b>+</b> do meio: as ações mudam conforme a tela.</p>
+  <p class="note"><b>Prévia v3: Criação e Comunidade (exemplo).</b> Na Biblioteca, toque em <b>Comunidade</b>: a barra muda, o botão do meio vira <b>Feed</b> (no Feed, ele abre o publicar). Role a tela: a barra de baixo se esconde.</p>
   <div class="phone" id="phone">
     <header class="top">
       <button class="ib back" id="back" aria-label="Voltar" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -145,12 +168,17 @@ const I={
  send:'<path d="M4 12l16-8-6 16-2.5-6.5z"/><path d="M11.5 13.5L20 4"/>',
  dots:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+ feed:'<rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/>',
+ heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ bookmark:'<path d="M6 4h12v17l-6-4-6 4z"/>',
  star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
 };
 const ic=(n)=>`<svg viewBox="0 0 24 24">${I[n]}</svg>`;
 
 const BOOK='A Estação das Marés';
-const BAR_LIB=[['lib','Biblioteca','lib'],['bulb','Ideias','ideiasGerais'],null,['send','Publicar','publicar'],['dots','A definir','definir']];
+const BAR_LIB=[['lib','Biblioteca','lib'],['bulb','Ideias','ideiasGerais'],null,['globe','Comunidade','feed'],['dots','A definir','definir']];
+const BAR_COM=[['home','Início','lib'],['compass','Descobrir','descobrir'],null,['bookmark','Salvos','salvos'],['user','Perfil','perfil']];
 const BAR_BOOK=[['home','Painel','painel'],['list','Capítulos','capitulos'],null,['user','Fichas','fichas'],['bulb','Ideias','ideias']];
 const BAR_ED=[['list','Capítulos','capitulos'],['user','Fichas','fichas'],null,['copy','Copiar p/ IA','ia'],['read','Ler','leitor']];
 
@@ -159,6 +187,7 @@ const PLUS={
  painel:{t:'Criar em '+BOOK,a:[['bulb','Ideia rápida'],['list','Capítulo'],['draft','Rascunho'],['user','Personagem'],['pin','Local'],['img','Imagem'],'sep',['star','Categorias']]},
  capitulos:{t:'Criar em Capítulos',a:[['list','Capítulo'],['scene','Cena'],['draft','Rascunho'],'sep',['star','Categorias']]},
  fichas:{t:'Criar em Fichas',a:[['user','Personagem'],['pin','Local'],['cloud','Clima'],['link','Relação'],['compass','Objeto ou evento'],'sep',['star','Categorias']]},
+ feed:{t:'Publicar na Comunidade',a:[['img','Nova prévia'],['read','Publicar capítulo'],['lib','Publicar livro']]},
  ideias:{t:'Captura rápida',a:[['bulb','Ideia'],['pen','Diálogo'],['scene','Possível cena'],['ai','Ideia p/ cocriar com IA'],'sep',['star','Tags']]},
  editor:{t:'Inserir no capítulo',a:[['user','Personagem'],['pin','Local'],['cloud','Clima'],['scene','Nova cena'],['hand','Bloco manuscrito'],['line','Separador'],['img','Imagem de referência'],['draft','Trazer rascunho'],['bulb','Ideia rápida']]},
 };
@@ -247,10 +276,39 @@ Naquela manhã o mar não voltou. Iracema contou as estacas…</pre>
    <button class="btn ghost" data-act="Colar resposta como rascunho">Colar resposta como rascunho</button>
   </div>
   <div class="card soon" style="margin-top:14px"><span class="pill p-plan">Em breve</span><b style="font-size:14px">IA dentro do app</b><div class="meta">Pedir e receber sem sair do BookStation.</div></div>`},
- publicar:{title:()=>`<span>Biblioteca / </span><b>Publicar</b>`,bar:BAR_LIB,on:'publicar',plus:'lib',html:()=>`
-  <div class="card soon"><span class="pill p-plan">Em breve</span><h3 style="font-family:var(--f-book);margin:8px 0 4px">Comunidade de leitura</h3><div class="meta">Publique capítulos dos seus livros e leia autores de todo lugar, com virada de página.</div></div>
-  <div class="lbl">Como vai ser</div>
-  <div class="stack">${idea('Você escolhe o livro e os capítulos. Sobe uma cópia daquele momento; o texto de trabalho continua privado.','')}${idea('Leitores veem a capa em cartões, entram e leem os capítulos publicados.','')}</div>`},
+ feed:{title:()=>`<span>Comunidade / </span><b>Feed</b>`,bar:BAR_COM,on:'feed',plus:'feed',html:()=>`
+  <div class="row"><span class="chip on">Seguindo</span><span class="chip">Para você</span><span class="chip">Fantasia</span><span class="chip">Romance</span><span class="chip">Mistério</span><span class="chip">Poesia</span></div>
+  <div class="stack" style="margin-top:12px">
+   ${post('Marina Toledo','O Jardim de Vidro','Cap. 3',`Ninguém plantava nada naquela cidade. As flores simplesmente apareciam, e cada uma tinha o nome de alguém que ia embora.`,'#1e3a2f,#0b1a14','#3f8a63',214,true)}
+   ${post('Caio Brandão','Ferrugem','Cap. 12',`“Você não consertou o robô, Tito. Você ensinou ele a mentir.”`,'#4a2a12,#1c1008','#b4652a',87,false,true)}
+   ${post('Iris N.','Cartas de um Farol','Prólogo',`Escrevo esta carta para quem acender a luz depois de mim.`,'#22284a,#0c0f22','#5a6bd1',1302)}
+  </div>`},
+ descobrir:{title:()=>`<span>Comunidade / </span><b>Descobrir</b>`,bar:BAR_COM,on:'descobrir',plus:'feed',html:()=>`
+  <div class="card" style="cursor:text;color:var(--faint)">Buscar livros, autores, gêneros…</div>
+  <div class="lbl">Em alta esta semana</div>
+  <div class="shelf">${cover('O Jardim de Vidro','Marina Toledo','#1e3a2f,#0b1a14')}${cover('Ferrugem','Caio Brandão','#4a2a12,#1c1008')}${cover('Cartas de um Farol','Iris N.','#22284a,#0c0f22')}${cover('Sete Luas','R. Amaral','#4a1d3a,#1d0b17')}</div>
+  <div class="lbl">Novos capítulos</div>
+  <div class="stack">${bookCard('Ferrugem','Ficção científica · Caio Brandão','Um mecânico e um robô fugitivo atravessam o sertão.','Cap. 12 publicado hoje · 12 capítulos','Em andamento','p-dev','#4a2a12,#1c1008','ler')}</div>`},
+ salvos:{title:()=>`<span>Comunidade / </span><b>Salvos</b>`,bar:BAR_COM,on:'salvos',plus:'feed',html:()=>`
+  <div class="row"><span class="chip on">Livros</span><span class="chip">Prévias</span></div>
+  <div class="lbl">Continuar lendo</div>
+  <div class="stack">${bookCard('O Jardim de Vidro','Fantasia · Marina Toledo','Parou no capítulo 3, página 41.','novo capítulo ontem','Lendo','p-esc','#1e3a2f,#0b1a14','ler')}</div>`},
+ perfil:{title:()=>`<span>Comunidade / </span><b>Perfil</b>`,bar:BAR_COM,on:'perfil',plus:'feed',html:()=>`
+  <div class="card" style="display:flex;gap:14px;align-items:center;cursor:default"><div class="av" style="background:#8a5a1e;width:60px;height:60px">L</div><div><h3 style="margin:0;font-family:var(--f-book)">Leonardo</h3><div class="meta">1 livro publicado · 48 seguidores</div></div></div>
+  <div class="lbl">Publicados</div>
+  <div class="stack">${bookCard(BOOK,'Fantasia · Mistério','7 capítulos publicados de 12. Os outros continuam privados.','última publicação: hoje','Em andamento','p-dev','#1d4e5f,#0e2a33','ler')}</div>`},
+ compor:{title:()=>`<span>Comunidade / </span><b>Nova prévia</b>`,bar:BAR_COM,on:null,plus:'feed',html:()=>`
+  <div class="sub">Uma imagem com um trecho seu por cima, levando para o capítulo.</div>
+  <div class="art" style="background:linear-gradient(160deg,#1d4e5f,#0e2a33)"><div class="quote" contenteditable="true">Naquela manhã o mar não voltou.</div></div>
+  <div class="lbl">Fonte do texto</div>
+  <div class="row"><span class="chip on">Literária</span><span class="chip">Manuscrita</span><span class="chip">Simples</span></div>
+  <div class="lbl">Leva para</div>
+  <div class="row"><span class="chip on">Cap. 7 · A maré que não voltou</span><span class="chip">Livro todo</span></div>
+  <div class="stack" style="margin-top:14px"><button class="btn" data-act="Prévia publicada">Publicar prévia</button></div>`},
+ ler:{title:()=>`<span>Ferrugem / </span><b>Cap. 12</b>`,bar:BAR_COM,on:null,plus:'feed',html:()=>`
+  <div class="flipbox"><div class="paper old page" id="page"><div style="text-align:center;font-size:12px;opacity:.6;margin-bottom:16px">CAPÍTULO 12</div><p id="ptext">O robô parou no meio da estrada de terra. Tito achou que fosse a bateria, até ouvir a voz dele mais baixa que de costume…</p><div style="text-align:center;font-size:12px;opacity:.6;margin-top:24px" id="pnum">página 1 de 9</div></div></div>
+  <div class="seg"><button data-flip="-1">‹ Anterior</button><button data-flip="1">Próxima ›</button></div>
+  <div class="sub" style="margin-top:12px;text-align:center">No app, deslizar vira a página</div>`},
  definir:{title:()=>`<span>Biblioteca / </span><b>A definir</b>`,bar:BAR_LIB,on:'definir',plus:'lib',html:()=>`<div class="card soon"><b style="font-size:14px">Espaço livre na barra</b><div class="meta">Vamos decidir juntos o que entra aqui.</div></div>`},
  leitor:{title:()=>`<span>${BOOK} / </span><b>Leitura</b>`,bar:BAR_ED,on:'leitor',plus:'editor',html:()=>`
   <div class="paper old" style="min-height:420px"><div style="text-align:center;font-size:12px;opacity:.6;margin-bottom:18px">CAPÍTULO 7</div><h2 style="text-align:center">A maré que não voltou</h2><p>Naquela manhã o mar não voltou. Iracema contou as estacas do cais duas vezes, como quem conta os dedos depois de um susto…</p><div style="text-align:center;font-size:12px;opacity:.6;margin-top:30px">87 de 214 · 41%</div></div>
@@ -271,7 +329,9 @@ Naquela manhã o mar não voltou. Iracema contou as estacas…</pre>
   </div>
   <div class="foot"><span>1.842 palavras · 10.311 caracteres</span><span><span class="dot">●</span> Salvo</span></div>`},
 };
-function bookCard(t,g,d,m,s,cls,col,main){return `<div class="card book" tabindex="0" data-go="${main?'painel':''}"><div class="cover" style="background:linear-gradient(160deg,${col})">${t}</div><div class="info"><h3>${t}</h3><div class="meta">${g}</div><div class="meta">${d}</div><div class="meta" style="color:var(--faint)">${m}</div><span class="pill ${cls}">${s}</span></div></div>`}
+function bookCard(t,g,d,m,s,cls,col,main){return `<div class="card book" tabindex="0" data-go="${main===true?'painel':(main||'')}"><div class="cover" style="background:linear-gradient(160deg,${col})">${t}</div><div class="info"><h3>${t}</h3><div class="meta">${g}</div><div class="meta">${d}</div><div class="meta" style="color:var(--faint)">${m}</div><span class="pill ${cls}">${s}</span></div></div>`}
+function post(a,b,c,txt,bg,av,likes,liked,saved){return `<article class="post"><div class="ph"><div class="av sm" style="background:${av}">${a[0]}</div><div><b>${a}</b><div class="meta">${b} · ${c}</div></div></div><div class="art" style="background:linear-gradient(160deg,${bg})"><div class="quote">${txt}</div></div><div class="pa"><button class="lk${liked?' on':''}" data-like>${ic('heart')}<span>${likes}</span></button><button class="lk${saved?' on':''}" data-save>${ic('bookmark')}</button><button class="rd" data-go="ler">Ler ${c}</button></div></article>`}
+function cover(t,a,c){return `<div class="cv" data-go="ler"><div class="cover" style="background:linear-gradient(160deg,${c});width:100%;height:150px">${t}</div><b>${t}</b><small>${a}</small></div>`}
 function tile(i,t,s,go){return `<div class="card tile" tabindex="0" data-go="${go}"><div class="ic">${ic(i)}</div><b>${t}</b><small>${s}</small></div>`}
 function chap(n,t,m,s,cls,go){return `<div class="card chap" tabindex="0" data-go="${go||''}"><div class="num">${n}</div><div class="info"><h4>${t}</h4><div class="meta">${m}</div></div><span class="pill ${cls}">${s}</span><span class="drag">⋮⋮</span></div>`}
 function person(n,r,refs,c){return `<div class="card person" tabindex="0"><div class="av" style="background:${c}">${n[0]}</div><div style="min-width:0"><h4>${n}</h4><div class="meta">${r}</div><div class="refs">Aparece em: ${refs}</div></div></div>`}
@@ -279,22 +339,31 @@ function idea(t,w,tags){return `<div class="card"><div style="font-size:14.5px;l
 
 function render(){
   const k=stack[stack.length-1], s=SCREENS[k];
-  $('title').innerHTML=s.title(); $('back').hidden=stack.length<2;
+  $('phone').classList.toggle('com',s.bar===BAR_COM); $('bar').classList.remove('hide'); $('title').innerHTML=s.title(); $('back').hidden=stack.length<2;
   $('main').innerHTML=s.html(); $('main').scrollTop=0;
-  $('bar').innerHTML=s.bar.map(b=>b?`<button class="${b[2]===s.on?'on':''}" data-tab="${b[2]}">${ic(b[0])}${b[1]}</button>`:`<button class="plus${plusOpen?' open':''}" id="plus" aria-label="Criar">${ic('plus')}</button>`).join('');
+  $('bar').innerHTML=s.bar.map(b=>b?`<button class="${b[2]===s.on?'on':''}" data-tab="${b[2]}">${ic(b[0])}${b[1]}</button>`:(s.bar===BAR_COM?`<button class="plus${plusOpen?' open':''}${k==='feed'?' here':''}" id="plus" aria-label="Feed">${ic(k==='feed'&&!plusOpen?'plus':(plusOpen?'plus':'feed'))}</button>`:`<button class="plus${plusOpen?' open':''}" id="plus" aria-label="Criar">${ic('plus')}</button>`)).join('');
   document.querySelectorAll('.sheet,.shade').forEach(e=>e.remove());
   if(plusOpen){const p=PLUS[s.plus];$('phone').insertAdjacentHTML('beforeend',`<div class="shade" id="shade"></div><div class="sheet"><div class="grab"></div><h5>${p.t}</h5><div class="acts">${p.a.map(a=>a==='sep'?'<div class="sep"></div>':`<button class="act" data-act="${a[1]}"><span class="ic">${ic(a[0])}</span>${a[1]}</button>`).join('')}</div></div>`)}
   const seg=$('paperSeg'); if(seg) seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.p===paper));
 }
 function go(k){ if(!k||!SCREENS[k])return; plusOpen=false; stack.push(k); render(); }
-function tab(k){ plusOpen=false; const base=SCREENS[k].bar===BAR_LIB?['lib']:['lib','painel']; stack= k==='lib'?['lib']: k==='painel'?['lib','painel']: SCREENS[stack[stack.length-1]].bar===BAR_ED&&SCREENS[k].bar===BAR_ED?[...stack.slice(0,-1),k]:[...base,k]; if(stack[stack.length-2]===k)stack.pop(); render(); }
+function tab(k){ plusOpen=false; const b=SCREENS[k].bar; const cur=stack[stack.length-1];
+  if(k==='lib') stack=['lib']; else if(k==='painel') stack=['lib','painel']; else if(k==='feed') stack=['lib','feed'];
+  else if(b===BAR_COM) stack=['lib','feed',k];
+  else if(SCREENS[cur].bar===BAR_ED&&b===BAR_ED) stack=[...stack.slice(0,-1),k];
+  else stack=(b===BAR_LIB?['lib']:['lib','painel']).concat(k);
+  render(); }
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;$('phone').appendChild(e);setTimeout(()=>e.remove(),1600)}
 $('back').onclick=()=>{plusOpen=false;stack.pop();render()};
 $('srch').onclick=()=>go('busca');
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-copy],[data-go],[data-tab],#plus,#shade,[data-act],[data-p],.ref');
+  const t=e.target.closest('[data-like],[data-save],[data-flip],[data-copy],[data-go],[data-tab],#plus,#shade,[data-act],[data-p],.ref');
   if(!t)return;
-  if(t.id==='plus'){plusOpen=!plusOpen;render();return}
+  if(t.id==='plus'){const cur=SCREENS[stack[stack.length-1]]; if(cur.bar===BAR_COM&&stack[stack.length-1]!=='feed'&&!plusOpen){tab('feed');return} plusOpen=!plusOpen;render();return}
+  if(t.dataset.like!==undefined){t.classList.toggle('on');const n=t.querySelector('span');n.textContent=+n.textContent+(t.classList.contains('on')?1:-1);return}
+  if(t.dataset.save!==undefined){t.classList.toggle('on');toast(t.classList.contains('on')?'Salvo':'Removido dos salvos');return}
+  if(t.dataset.flip){flip(+t.dataset.flip);return}
+  if(t.dataset.act==='Nova prévia'){plusOpen=false;go('compor');return}
   if(t.id==='shade'){plusOpen=false;render();return}
   if(t.dataset.copy!==undefined){toast('Texto copiado. Cole no chat da IA.');return}
   if(t.dataset.act){plusOpen=false;render();toast('Abriria: '+t.dataset.act);return}
@@ -304,5 +373,8 @@ document.addEventListener('click',e=>{
   if(t.dataset.go)go(t.dataset.go); else if(t.closest('.card'))toast('Abriria a ficha / o item');
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.go!==undefined)e.target.click()});
+let pg=1;const PT=['O robô parou no meio da estrada de terra. Tito achou que fosse a bateria, até ouvir a voz dele mais baixa que de costume…','— Tem gente seguindo a gente desde Juazeiro — disse o robô. — Eu não contei antes porque você ia querer voltar.','Tito olhou para trás. A poeira subia devagar no horizonte, como se a estrada respirasse.'];
+function flip(d){const el=$('page');if(!el)return;const n=Math.min(9,Math.max(1,pg+d));if(n===pg)return;pg=n;el.classList.remove('turn-f','turn-b');void el.offsetWidth;el.classList.add(d>0?'turn-f':'turn-b');setTimeout(()=>{$('ptext').textContent=PT[(pg-1)%PT.length];$('pnum').textContent='página '+pg+' de 9'},230)}
+let lastY=0;$('main').addEventListener('scroll',e=>{const y=e.target.scrollTop;if(y>lastY+6&&y>60)$('bar').classList.add('hide');else if(y<lastY-6)$('bar').classList.remove('hide');lastY=y},{passive:true});
 render();
 </script>
