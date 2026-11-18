@@ -5,7 +5,7 @@ Ambiente para organizar, planejar, escrever e acompanhar livros, do primeiro rab
 Cada livro é um **pequeno universo independente**: capítulos, cenas, rascunhos, ideias, personagens,
 locais, climas, imagens e referências pertencem a uma obra e se ligam entre si, sem misturar com outras.
 
-**Situação:** versão 0.2.0 (F1 esqueleto + F2 editor, parte 1). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
+**Situação:** versão 0.3.0 (F1 esqueleto + F2 editor completo). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
 
 ## O que já funciona (F1)
 - **Biblioteca:** livros em cartões com capa, gênero, descrição, última edição e situação; filtros por situação e
@@ -35,11 +35,20 @@ locais, climas, imagens e referências pertencem a uma obra e se ligam entre si,
 - Backup e exportar livro levam os capítulos; excluir de vez apaga os capítulos junto.
 - O editor carrega só quando é aberto (a Biblioteca continua leve).
 
+## Editor (F2, parte 2)
+- **Aa (aparência, por livro):** fonte Literária ou Simples, tamanho da letra (13 a 24), cor da página (branca, preta, papel antigo).
+- **Bloco manuscrito** (fonte Caveat) só no parágrafo atual, pelo Aa, pelo Mais ou pelo + do editor.
+- **Busca no capítulo** (lupa do topo ou Ctrl F): sem diferenciar acento nem maiúscula, destaca os achados, ↑ ↓ para navegar.
+- **Histórico:** cópia automática ao abrir o capítulo (se o texto mudou há mais de 30 min; guarda as 20 mais novas),
+  versões com nome (nunca saem sozinhas), ver e restaurar (o texto de antes vira "Antes de restaurar").
+- **Sem distrações:** só a página; botão "Sair do modo foco" e contador discreto (Ctrl Shift F, Esc sai).
+- **Atalhos no computador** (Mais › Atalhos): negrito, itálico, sublinhado, tachado, títulos, buscar, histórico, foco.
+
 ## Estrutura
 | Pasta / arquivo | O que é |
 |---|---|
 | `src/data.ts` | modelo de dados e `normalize()` (todo campo novo precisa de padrão aqui) |
-| `src/livros.ts`, `src/capitulos.ts`, `src/backup.ts`, `src/router.ts` | regras puras, com testes em `src/*.test.ts` |
+| `src/livros.ts`, `src/capitulos.ts`, `src/versoes.ts`, `src/busca.ts`, `src/backup.ts`, `src/router.ts` | regras puras, com testes em `src/*.test.ts` |
 | `src/db.ts` | banco local (base copiada do CP Hub) |
 | `src/ui.tsx`, `src/Topo.tsx`, `src/Importar.tsx` | componentes de tela |
 | `src/Editor.tsx` | editor de texto (TipTap, base copiada do CP Hub) |

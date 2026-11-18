@@ -1,3 +1,4 @@
+import type { Versao } from './versoes.ts';
 /**
  * Modelo de dados do BookStation e normalize(): todo dado antigo ou backup passa por aqui.
  * Regra: todo campo novo precisa de valor padrão neste arquivo.
@@ -27,6 +28,16 @@ export const GENEROS = ['Fantasia', 'Mistério', 'Romance', 'Ficção científic
 /** Capas prontas (gradiente). O número fica salvo no livro. */
 export const CAPAS = ['#1d4e5f,#0e2a33', '#6b2e2e,#331414', '#3c3a6b,#1b1a36', '#2f5a2a,#142812', '#6b5517,#2b2208', '#4a1d3a,#1d0b17'];
 
+export type Fonte = 'literaria' | 'simples';
+export type CorPagina = 'papel' | 'branca' | 'preta';
+export interface Aparencia {
+  fonte: Fonte;
+  /** Tamanho da letra no editor, em px. */
+  tamanho: number;
+  pagina: CorPagina;
+}
+export const APARENCIA_PADRAO: Aparencia = { fonte: 'literaria', tamanho: 17, pagina: 'papel' };
+
 export interface Livro {
   id: string;
   titulo: string;
@@ -38,6 +49,8 @@ export interface Livro {
   capaImg: string | null;
   situacao: Situacao;
   roteiro: Roteiro;
+  /** Como o texto aparece no editor (vale só para este livro). */
+  aparencia: Aparencia;
   arquivado: boolean;
   /** Quando foi para a lixeira (ms) ou null. */
   excluidoEm: number | null;
@@ -84,6 +97,7 @@ export interface Dados {
   salvoEm: number;
   livros: Livro[];
   capitulos: Capitulo[];
+  versoes: Versao[];
   ajustes: Ajustes;
 }
 
@@ -92,6 +106,15 @@ export const AJUSTES_PADRAO: Ajustes = { barraRecolhe: true, tema: 'escuro' };
 const str = (v: unknown, d = '') => (typeof v === 'string' ? v : d);
 const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
 const oneOf = <T extends string>(v: unknown, ok: readonly T[], d: T): T => (ok.includes(v as T) ? (v as T) : d);
+
+function normalizeAparencia(v: unknown): Aparencia {
+  const a = v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
+  return {
+    fonte: oneOf(a.fonte, ['literaria', 'simples'] as const, APARENCIA_PADRAO.fonte),
+    tamanho: Math.min(24, Math.max(13, num(a.tamanho, APARENCIA_PADRAO.tamanho))),
+    pagina: oneOf(a.pagina, ['papel', 'branca', 'preta'] as const, APARENCIA_PADRAO.pagina),
+  };
+}
 
 export function normalizeLivro(raw: unknown, agora = Date.now()): Livro | null {
   if (!raw || typeof raw !== 'object') return null;
@@ -108,6 +131,7 @@ export function normalizeLivro(raw: unknown, agora = Date.now()): Livro | null {
     capaImg: typeof r.capaImg === 'string' && r.capaImg.startsWith('data:image/') ? r.capaImg : null,
     situacao: oneOf(r.situacao, SITUACOES.map((s) => s.v), 'planejamento'),
     roteiro: oneOf(r.roteiro, ROTEIROS.map((s) => s.v), 'livre'),
+    aparencia: normalizeAparencia(r.aparencia),
     arquivado: r.arquivado === true,
     excluidoEm: typeof r.excluidoEm === 'number' ? r.excluidoEm : null,
     criadoEm,
@@ -152,11 +176,17 @@ export function normalize(raw: unknown, agora = Date.now()): Dados {
   const capitulos = (Array.isArray(r.capitulos) ? r.capitulos : [])
     .map((c) => normalizeCapitulo(c, agora))
     .filter((c): c is Capitulo => !!c && ids.has(c.livroId) && !vistosCap.has(c.id) && !!vistosCap.add(c.id));
+  const capIds = new Set(capitulos.map((c) => c.id));
+  const versoes = (Array.isArray(r.versoes) ? r.versoes : []).filter((v): v is Versao => {
+    const x = v as Versao;
+    return !!x && typeof x === 'object' && typeof x.id === 'string' && capIds.has(x.capId) && typeof x.quando === 'number' && normalizeDoc(x.conteudo) !== null;
+  }).map((v) => ({ ...v, nome: str(v.nome), palavras: num(v.palavras, 0), livroId: str(v.livroId) }));
   return {
     versao: 1,
     salvoEm: num(r.salvoEm, 0),
     livros,
     capitulos,
+    versoes,
     ajustes: {
       barraRecolhe: typeof a.barraRecolhe === 'boolean' ? a.barraRecolhe : AJUSTES_PADRAO.barraRecolhe,
       tema: oneOf(a.tema, ['escuro', 'claro', 'sistema'] as const, AJUSTES_PADRAO.tema),

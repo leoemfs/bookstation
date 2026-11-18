@@ -14,8 +14,10 @@ import { NovoLivro } from './telas/NovoLivro.tsx';
 import { Painel } from './telas/Painel.tsx';
 const Escrever = lazy(() => import('./telas/Escrever.tsx').then((m) => ({ default: m.Escrever })));
 import { novoCapitulo, semOrfaos } from './capitulos.ts';
+import { semOrfas } from './versoes.ts';
 import { novoId } from './livros.ts';
 import { ativo as edAtivo } from './editorAtivo.ts';
+import { alternarManuscrito } from './manuscrito.ts';
 
 const CHAVE = 'dados';
 
@@ -88,6 +90,7 @@ export function App() {
     let n = { ...fn(d), salvoEm: Date.now() };
     // capítulos de livros que saíram de vez também saem
     if (n.livros !== d.livros) n = { ...n, capitulos: semOrfaos(n.capitulos, new Set(n.livros.map((l) => l.id))) };
+    if (n.capitulos !== d.capitulos && n.versoes.length) n = { ...n, versoes: semOrfas(n.versoes, new Set(n.capitulos.map((c) => c.id))) };
     atual.current = n;
     setDados(n);
     dbSet(CHAVE, n).then((r) => {
@@ -146,8 +149,9 @@ export function App() {
               <>
                 <button className="act" onClick={inserir(() => edAtivo.editor?.chain().focus().setHorizontalRule().run())}><span className="ic" style={{ fontSize: 18 }}>⁂</span>Separador</button>
                 <button className="act" onClick={inserir(() => edAtivo.editor?.chain().focus().toggleBlockquote().run())}><span className="ic" style={{ fontSize: 18 }}>❝</span>Citação</button>
+                <button className="act" onClick={inserir(() => { if (edAtivo.editor) alternarManuscrito(edAtivo.editor); })}><span className="ic" style={{ fontFamily: 'var(--f-mao)', fontSize: 20 }}>Aa</span>Bloco manuscrito</button>
                 <button className="act" onClick={novoCap}><span className="ic"><Icon n="lista" /></span>Novo capítulo</button>
-                {([['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['clima', 'Clima', 'F5'], ['caneta', 'Bloco manuscrito', 'F2 parte 2'], ['rascunho', 'Trazer rascunho', 'F3'], ['ideia', 'Ideia rápida', 'F3']] as [IconName, string, string][]).map(([ic, t, f]) => (
+                {([['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['clima', 'Clima', 'F5'], ['rascunho', 'Trazer rascunho', 'F3'], ['ideia', 'Ideia rápida', 'F3']] as [IconName, string, string][]).map(([ic, t, f]) => (
                   <button key={t} className="act breve" onClick={breve(f)}><span className="ic"><Icon n={ic} /></span>{t}<small>em breve</small></button>
                 ))}
               </>

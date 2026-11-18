@@ -193,3 +193,42 @@ main.escrever { padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); 
 .ed-texto mark { background: #f5d76e; color: #2a2108; padding: 0 2px; border-radius: 2px; }
 .ed-texto p.is-editor-empty:first-child::before, .ed-texto .is-empty::before { content: attr(data-placeholder); float: left; height: 0; pointer-events: none; opacity: .4; }
 .ed-rodape { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--muted); margin: 10px 4px 0; font-variant-numeric: tabular-nums; }
+
+/* ---------- editor, parte 2 ---------- */
+.pagina.pg-papel { --pg: #efe3c4; --ink: #3a2f1c; }
+.pagina.pg-branca { --pg: #fbfaf7; --ink: #23211d; }
+.pagina.pg-preta { --pg: #111113; --ink: #e6e1d8; border: 1px solid var(--border); }
+.pagina.pg-preta .ed-texto mark { background: #8a6d1d; color: #fff; }
+.pagina.f-simples, .pagina.f-simples .cap-titulo, .pagina.f-simples .ed-texto h1, .pagina.f-simples .ed-texto h2, .pagina.f-simples .ed-texto h3 { font-family: var(--f-ui); }
+.cap-titulo { font-size: 1.3em; }
+:root { --f-mao: 'Caveat', 'Segoe Print', cursive; }
+.ed-texto p.manuscrito { font-family: var(--f-mao); font-size: 1.3em; line-height: 1.35; padding-left: 12px; border-left: 2px solid currentColor; text-indent: 0; }
+.achado { background: rgb(245 215 110 / .55); border-radius: 2px; }
+.achado.atual { background: #f59e0b; color: #1a1204; }
+.busca .ib:disabled { opacity: .35; }
+.seg.grande { gap: 6px; }
+.seg.grande button { flex: 1; padding: 11px 6px; font-size: 14px; border: 1px solid var(--border); background: var(--surface); }
+.seg.grande button.on { border-color: var(--accent-line); }
+.seg.grande button:disabled { opacity: .4; }
+.cores { display: flex; gap: 8px; }
+.cores button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 4px; font-size: 12.5px; color: var(--muted); }
+.cores button.on { border-color: var(--accent); color: var(--accent); }
+.cores i { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border-strong); }
+.acts.quatro { grid-template-columns: repeat(4, 1fr); }
+.acts.quatro .act { font-size: 11px; padding: 10px 4px; }
+.versoes { display: flex; flex-direction: column; }
+.ver { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 4px; border-top: 1px solid var(--border); font-size: 14px; }
+.ver:first-child { border-top: 0; }
+.ver small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.ver button { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 7px 12px; font-size: 13px; }
+.ver-texto { white-space: pre-wrap; font-family: var(--f-book); font-size: 15px; line-height: 1.6; max-height: 50vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+.atalhos { display: flex; flex-direction: column; }
+.atalhos div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 2px; border-top: 1px solid var(--border); font-size: 14px; }
+.atalhos div:first-child { border-top: 0; }
+kbd { font-family: ui-monospace, monospace; font-size: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; color: var(--muted); white-space: nowrap; }
+body.modo-foco .top, body.modo-foco .tabbar, body.modo-foco .ed-barra, body.modo-foco .ed-rodape, body.modo-foco .busca { display: none !important; }
+body.modo-foco main.scroll { padding-top: calc(16px + env(safe-area-inset-top, 0px)); }
+body.modo-foco .pagina { min-height: calc(100vh - 40px); }
+.foco-sair { position: fixed; z-index: 30; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); background: rgb(0 0 0 / .5); color: #fff; border: 0; border-radius: 999px; padding: 8px 14px; font-size: 12.5px; backdrop-filter: blur(6px); }
+.foco-conta { position: fixed; z-index: 30; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); background: var(--bg); padding: 4px 10px; border-radius: 999px; opacity: .85; }
+.escrever.com-busca .ed-barra { top: calc(var(--top-h) + 66px); }

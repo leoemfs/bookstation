@@ -1,23 +1,81 @@
 /**
- * Editor de texto dos capítulos (F2, parte 1). Base copiada do editor do CP Hub e adaptada para livros.
- * - Barra em 2 linhas no celular; "Mais" abre o resto.
+ * Editor de texto dos capítulos (F2). Base copiada do editor do CP Hub e adaptada para livros.
+ * - Barra em 2 linhas; "Aa" (aparência) e "Mais" abrem o resto.
  * - Avisa as mudanças pouco depois de parar de digitar (quem chama salva) e ao sair da tela.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import type { Node as PMNode } from '@tiptap/pm/model';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import { Placeholder } from '@tiptap/extensions';
-import type { Doc } from './data.ts';
+import type { Aparencia, CorPagina, Doc } from './data.ts';
+import { encontrar } from './busca.ts';
 import { Sheet } from './ui.tsx';
 import { ativo } from './editorAtivo.ts';
+import { alternarManuscrito } from './manuscrito.ts';
 
-/** Recuo da primeira linha do parágrafo (como em livro impresso). */
-const Recuo = Extension.create({
-  name: 'recuo',
+/** Recuo da primeira linha e bloco manuscrito: marcações do parágrafo. */
+const Paragrafo = Extension.create({
+  name: 'paragrafoExtra',
   addGlobalAttributes() {
-    return [{ types: ['paragraph'], attributes: { recuo: { default: false, parseHTML: (el) => el.classList.contains('recuo'), renderHTML: (a) => (a.recuo ? { class: 'recuo' } : {}) } } }];
+    const bool = (classe: string) => ({ default: false, parseHTML: (el: HTMLElement) => el.classList.contains(classe), renderHTML: (a: Record<string, unknown>) => (a[classe] ? { class: classe } : {}) });
+    return [{ types: ['paragraph'], attributes: { recuo: bool('recuo'), manuscrito: bool('manuscrito') } }];
+  },
+});
+
+/* ---------- busca no texto (destaca os achados sem mexer no texto) ---------- */
+interface EstadoBusca { termo: string; atual: number; achados: { from: number; to: number }[] }
+export const chaveBusca = new PluginKey<EstadoBusca>('busca');
+function achar(doc: PMNode, termo: string): { from: number; to: number }[] {
+  const out: { from: number; to: number }[] = [];
+  if (!termo.trim()) return out;
+  doc.descendants((node, pos) => {
+    if (!node.isTextblock) return true;
+    let txt = '';
+    const mapa: number[] = [];
+    node.forEach((filho, off) => {
+      if (filho.isText && filho.text) {
+        for (let i = 0; i < filho.text.length; i++) mapa.push(pos + 1 + off + i);
+        txt += filho.text;
+      } else {
+        mapa.push(pos + 1 + off);
+        txt += '￼';
+      }
+    });
+    for (const [a, b] of encontrar(txt, termo)) out.push({ from: mapa[a], to: mapa[b - 1] + 1 });
+    return false;
+  });
+  return out;
+}
+const Busca = Extension.create({
+  name: 'busca',
+  addProseMirrorPlugins() {
+    return [
+      new Plugin<EstadoBusca>({
+        key: chaveBusca,
+        state: {
+          init: () => ({ termo: '', atual: 0, achados: [] }),
+          apply(tr, ant, _old, novo) {
+            const meta = tr.getMeta(chaveBusca) as Partial<EstadoBusca> | undefined;
+            if (!meta && !tr.docChanged) return ant;
+            const termo = meta?.termo ?? ant.termo;
+            const achados = achar(novo.doc, termo);
+            return { termo, achados, atual: Math.min(meta?.atual ?? ant.atual, Math.max(0, achados.length - 1)) };
+          },
+        },
+        props: {
+          decorations(state) {
+            const s = chaveBusca.getState(state);
+            if (!s || !s.achados.length) return DecorationSet.empty;
+            return DecorationSet.create(state.doc, s.achados.map((a, i) => Decoration.inline(a.from, a.to, { class: i === s.atual ? 'achado atual' : 'achado' })));
+          },
+        },
+      }),
+    ];
   },
 });
 
@@ -34,7 +92,7 @@ function blocoAtual(e: Editor): Bloco {
   if (e.isActive('blockquote')) return 'quote';
   return 'p';
 }
-function mudarBloco(e: Editor, b: Bloco) {
+export function mudarBloco(e: Editor, b: Bloco) {
   let c = e.chain().focus();
   if (e.isActive('blockquote') && b !== 'quote') c = c.toggleBlockquote();
   if (b === 'p') c = c.setParagraph();
@@ -42,7 +100,6 @@ function mudarBloco(e: Editor, b: Bloco) {
   else c = c.setHeading({ level: Number(b[1]) as 1 | 2 | 3 });
   c.run();
 }
-
 
 function Btn({ label, on, onClick, disabled, children, className = '' }: { label: string; on?: boolean; onClick: () => void; disabled?: boolean; children: ReactNode; className?: string }) {
   return (
@@ -53,8 +110,23 @@ function Btn({ label, on, onClick, disabled, children, className = '' }: { label
   );
 }
 
-export function EditorTexto({ doc, onChange, onDigitando }: { doc: Doc | null; onChange: (doc: Doc, texto: string) => void; onDigitando?: (texto: string) => void }) {
-  const [mais, setMais] = useState(false);
+export const CORES_PAGINA: { v: CorPagina; l: string; cor: string }[] = [
+  { v: 'branca', l: 'Branca', cor: '#fbfaf7' },
+  { v: 'preta', l: 'Preta', cor: '#111113' },
+  { v: 'papel', l: 'Papel antigo', cor: '#efe3c4' },
+];
+
+export interface Acoes { buscar: () => void; historico: () => void; foco: () => void; atalhos: () => void }
+
+export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia, acoes }: {
+  doc: Doc | null;
+  onChange: (doc: Doc, texto: string) => void;
+  onDigitando?: (texto: string) => void;
+  aparencia: Aparencia;
+  onAparencia: (a: Partial<Aparencia>) => void;
+  acoes: Acoes;
+}) {
+  const [folha, setFolha] = useState<null | 'mais' | 'aa'>(null);
   const timer = useRef<number | undefined>(undefined);
   const ultimo = useRef(onChange);
   ultimo.current = onChange;
@@ -69,7 +141,8 @@ export function EditorTexto({ doc, onChange, onDigitando }: { doc: Doc | null; o
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] }, link: false, code: false, codeBlock: false }),
       Highlight,
-      Recuo,
+      Paragrafo,
+      Busca,
       Placeholder.configure({ placeholder: ({ node }) => (node.type.name === 'heading' ? 'Título' : 'Comece a escrever…') }),
     ],
     content: doc ?? undefined,
@@ -107,6 +180,9 @@ export function EditorTexto({ doc, onChange, onDigitando }: { doc: Doc | null; o
   if (!editor) return null;
   const e = editor;
   const recuo = !!e.getAttributes('paragraph').recuo;
+  const manuscrito = !!e.getAttributes('paragraph').manuscrito;
+  const fechar = () => setFolha(null);
+  const faz = (fn: () => void) => () => { fechar(); fn(); };
 
   return (
     <>
@@ -122,29 +198,64 @@ export function EditorTexto({ doc, onChange, onDigitando }: { doc: Doc | null; o
         </div>
         <div className="ed-linha">
           <Btn label="Sublinhado" on={e.isActive('underline')} onClick={() => e.chain().focus().toggleUnderline().run()}><u>S</u></Btn>
-          <Btn label="Tachado" on={e.isActive('strike')} onClick={() => e.chain().focus().toggleStrike().run()}><s>T</s></Btn>
+          <Btn label="Aparência" on={folha === 'aa'} onClick={() => setFolha('aa')}><span style={{ fontFamily: 'var(--f-book)', fontWeight: 600 }}>Aa</span></Btn>
           <Btn label="Desfazer" disabled={!e.can().undo()} onClick={() => e.chain().focus().undo().run()}><span className="ed-txt">↶</span></Btn>
           <Btn label="Refazer" disabled={!e.can().redo()} onClick={() => e.chain().focus().redo().run()}><span className="ed-txt">↷</span></Btn>
-          <Btn label="Mais ferramentas" className="ed-mais" onClick={() => setMais(true)}><span className="ed-txt">Mais</span></Btn>
+          <Btn label="Mais ferramentas" className="ed-mais" onClick={() => setFolha('mais')}><span className="ed-txt">Mais</span></Btn>
         </div>
       </div>
       <EditorContent editor={e} />
-      {mais && (
-        <Sheet titulo="Mais ferramentas" onClose={() => setMais(false)}>
-          <div className="acts">
+
+      {folha === 'aa' && (
+        <Sheet titulo="Aparência da escrita" onClose={fechar}>
+          <div className="lbl" style={{ marginTop: 0 }}>Fonte do texto</div>
+          <div className="seg grande">
+            <button className={aparencia.fonte === 'literaria' ? 'on' : ''} style={{ fontFamily: 'var(--f-book)' }} onClick={() => onAparencia({ fonte: 'literaria' })}>Literária</button>
+            <button className={aparencia.fonte === 'simples' ? 'on' : ''} onClick={() => onAparencia({ fonte: 'simples' })}>Simples</button>
+          </div>
+          <div className="lbl">Parágrafo atual</div>
+          <div className="seg grande">
+            <button className={manuscrito ? 'on' : ''} style={{ fontFamily: 'var(--f-mao)', fontSize: 19 }} onMouseDown={(ev) => ev.preventDefault()} onClick={faz(() => alternarManuscrito(e))}>Bloco manuscrito</button>
+            <button className={recuo ? 'on' : ''} onMouseDown={(ev) => ev.preventDefault()} onClick={faz(() => e.chain().focus().updateAttributes('paragraph', { recuo: !recuo }).run())}>Recuo</button>
+          </div>
+          <div className="lbl">Tamanho da letra · {aparencia.tamanho}</div>
+          <div className="seg grande">
+            <button disabled={aparencia.tamanho <= 13} onClick={() => onAparencia({ tamanho: aparencia.tamanho - 1 })}>A−</button>
+            <button disabled={aparencia.tamanho >= 24} onClick={() => onAparencia({ tamanho: aparencia.tamanho + 1 })}>A+</button>
+          </div>
+          <div className="lbl">Cor da página</div>
+          <div className="cores">
+            {CORES_PAGINA.map((c) => (
+              <button key={c.v} className={aparencia.pagina === c.v ? 'on' : ''} onClick={() => onAparencia({ pagina: c.v })} aria-label={c.l} aria-pressed={aparencia.pagina === c.v}>
+                <i style={{ background: c.cor }} />{c.l}
+              </button>
+            ))}
+          </div>
+          <div className="meta" style={{ marginTop: 12 }}>Vale só para este livro. A cor da página não depende do tema do app.</div>
+        </Sheet>
+      )}
+
+      {folha === 'mais' && (
+        <Sheet titulo="Mais ferramentas" onClose={fechar}>
+          <div className="acts quatro">
             {([
+              ['T̶', 'Tachado', e.isActive('strike'), () => e.chain().focus().toggleStrike().run()],
               ['1.', 'Lista numerada', e.isActive('orderedList'), () => e.chain().focus().toggleOrderedList().run()],
               ['❝', 'Citação', e.isActive('blockquote'), () => mudarBloco(e, e.isActive('blockquote') ? 'p' : 'quote')],
               ['⁂', 'Separador', false, () => e.chain().focus().setHorizontalRule().run()],
-              ['⇥', recuo ? 'Tirar recuo' : 'Recuo', recuo, () => e.chain().focus().updateAttributes('paragraph', { recuo: !recuo }).run()],
-              ['⇤', 'Limpar formatação', false, () => e.chain().focus().unsetAllMarks().clearNodes().run()],
+              ['⇥', 'Recuo', recuo, () => e.chain().focus().updateAttributes('paragraph', { recuo: !recuo }).run()],
+              ['✎', 'Manuscrito', manuscrito, () => alternarManuscrito(e)],
+              ['⌕', 'Buscar', false, acoes.buscar],
+              ['⟲', 'Histórico', false, acoes.historico],
+              ['◻', 'Sem distrações', false, acoes.foco],
+              ['⌘', 'Atalhos', false, acoes.atalhos],
+              ['⇤', 'Limpar formatação', false, () => e.chain().focus().unsetAllMarks().clearNodes().updateAttributes('paragraph', { recuo: false, manuscrito: false }).run()],
             ] as [string, string, boolean, () => void][]).map(([s, l, on, fn]) => (
-              <button key={l} className={`act${on ? ' on' : ''}`} onMouseDown={(ev) => ev.preventDefault()} onClick={() => { setMais(false); fn(); }}>
+              <button key={l} className={`act${on ? ' on' : ''}`} onMouseDown={(ev) => ev.preventDefault()} onClick={faz(fn)}>
                 <span className="ic" style={{ fontSize: 18, fontWeight: 600 }}>{s}</span>{l}
               </button>
             ))}
           </div>
-          <div className="meta" style={{ marginTop: 12 }}>Na parte 2 do editor chegam: fontes e cor da página, bloco manuscrito, busca, histórico e modo sem distrações.</div>
         </Sheet>
       )}
     </>

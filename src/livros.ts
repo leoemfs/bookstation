@@ -1,5 +1,5 @@
 /** Regras dos livros: criar, filtrar, ordenar, arquivar, lixeira. Sem tela, sem banco. */
-import type { Livro, Roteiro, Situacao } from './data.ts';
+import { APARENCIA_PADRAO, type Livro, type Roteiro, type Situacao } from './data.ts';
 
 export const DIAS_LIXEIRA = 30;
 const DIA = 86_400_000;
@@ -25,6 +25,7 @@ export function novoLivro(
     capaImg: e.capaImg ?? null,
     situacao: e.situacao ?? 'planejamento',
     roteiro: e.roteiro ?? 'livre',
+    aparencia: { ...APARENCIA_PADRAO },
     arquivado: false,
     excluidoEm: null,
     criadoEm: agora,
