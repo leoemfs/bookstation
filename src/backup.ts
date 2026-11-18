@@ -1,5 +1,6 @@
 /** Backup em arquivo: exportar tudo (ou um livro) e importar de volta. */
-import { normalize, normalizeLivro, type Dados, type Livro } from './data.ts';
+import { normalize, normalizeCapitulo, normalizeLivro, type Capitulo, type Dados, type Livro } from './data.ts';
+import { copiarCapitulos } from './capitulos.ts';
 
 export const APP = 'bookstation';
 
@@ -7,11 +8,11 @@ export function exportar(dados: Dados, agora: number): string {
   return JSON.stringify({ app: APP, tipo: 'tudo', exportadoEm: new Date(agora).toISOString(), dados }, null, 1);
 }
 
-export function exportarLivro(livro: Livro, agora: number): string {
-  return JSON.stringify({ app: APP, tipo: 'livro', exportadoEm: new Date(agora).toISOString(), livro }, null, 1);
+export function exportarLivro(livro: Livro, capitulos: Capitulo[], agora: number): string {
+  return JSON.stringify({ app: APP, tipo: 'livro', exportadoEm: new Date(agora).toISOString(), livro, capitulos: capitulos.filter((c) => c.livroId === livro.id) }, null, 1);
 }
 
-export type Importado = { tipo: 'tudo'; dados: Dados } | { tipo: 'livro'; livro: Livro };
+export type Importado = { tipo: 'tudo'; dados: Dados } | { tipo: 'livro'; livro: Livro; capitulos: Capitulo[] };
 
 /** Lê um arquivo de backup. Erros vêm com mensagem para mostrar à pessoa. */
 export function importar(texto: string, agora: number): Importado {
@@ -26,15 +27,20 @@ export function importar(texto: string, agora: number): Importado {
   if (r.tipo === 'livro') {
     const livro = normalizeLivro(r.livro, agora);
     if (!livro) throw new Error('O livro deste arquivo está incompleto.');
-    return { tipo: 'livro', livro };
+    const capitulos = (Array.isArray(r.capitulos) ? r.capitulos : []).map((c) => normalizeCapitulo(c, agora)).filter((c): c is Capitulo => !!c && c.livroId === livro.id);
+    return { tipo: 'livro', livro, capitulos };
   }
   return { tipo: 'tudo', dados: normalize(r.dados, agora) };
 }
 
-/** Junta um livro importado sem apagar nada: se o id já existe, entra como novo. */
-export function juntarLivro(livros: Livro[], livro: Livro, novoId: string): Livro[] {
-  const l = livros.some((x) => x.id === livro.id) ? { ...livro, id: novoId } : livro;
-  return [{ ...l, excluidoEm: null }, ...livros];
+/** Junta um livro importado (com os capítulos) sem apagar nada: entra sempre com ids novos. */
+export function juntarLivro(dados: Dados, livro: Livro, capitulos: Capitulo[], novoId: () => string): Dados {
+  const id = novoId();
+  return {
+    ...dados,
+    livros: [{ ...livro, id, excluidoEm: null }, ...dados.livros],
+    capitulos: [...dados.capitulos, ...copiarCapitulos(capitulos, livro.id, id, novoId)],
+  };
 }
 
 export function nomeArquivo(base: string, agora: number): string {

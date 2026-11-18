@@ -5,7 +5,7 @@ Ambiente para organizar, planejar, escrever e acompanhar livros, do primeiro rab
 Cada livro é um **pequeno universo independente**: capítulos, cenas, rascunhos, ideias, personagens,
 locais, climas, imagens e referências pertencem a uma obra e se ligam entre si, sem misturar com outras.
 
-**Situação:** versão 0.1.0 (F1, esqueleto). Publicado em https://leoemfs.github.io/bookstation/ depois de mesclar no `main`.
+**Situação:** versão 0.2.0 (F1 esqueleto + F2 editor, parte 1). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
 
 ## O que já funciona (F1)
 - **Biblioteca:** livros em cartões com capa, gênero, descrição, última edição e situação; filtros por situação e
@@ -21,16 +21,29 @@ locais, climas, imagens e referências pertencem a uma obra e se ligam entre si,
   (Biblioteca · Ideias · + · Comunidade · Ajustes; dentro do livro: Painel · Capítulos · + · Fichas · Ideias);
   o voltar do celular fecha as folhas.
 - **PWA:** instala no celular e no computador e abre sem internet depois da primeira visita.
-- Dados **só no aparelho** (IndexedDB, com reserva no localStorage).
+- Dados **só no aparelho** (IndexedDB, com reserva no localStorage). Cada mudança é gravada na hora; ao fechar o app,
+  uma cópia de emergência vai para o localStorage e, ao abrir, o app usa a cópia mais nova.
+
+## Editor (F2, parte 1)
+- **Escrever um capítulo:** "Comece a escrever" no painel cria o Capítulo 1; o + do livro cria o próximo. O número acompanha a posição.
+- Título do capítulo editável no topo da página; página cor de papel antigo, fonte Literata.
+- **Barra em 2 linhas** (presa no topo ao rolar): estilo (Parágrafo, Títulos 1-3, Citação), negrito, itálico, destaque, lista;
+  sublinhado, tachado, desfazer, refazer, **Mais** (lista numerada, citação, separador ⁂, recuo da primeira linha, limpar formatação).
+- **+ no editor:** separador, citação, novo capítulo (o resto chega nas próximas fases).
+- **Salva sozinho** (indicador "Salvando… / Salvo"), conta palavras e caracteres ao vivo.
+- Painel: "Continuar escrevendo" abre o último capítulo editado com o "Parou em…"; andamento com capítulos, palavras e barra por situação.
+- Backup e exportar livro levam os capítulos; excluir de vez apaga os capítulos junto.
+- O editor carrega só quando é aberto (a Biblioteca continua leve).
 
 ## Estrutura
 | Pasta / arquivo | O que é |
 |---|---|
 | `src/data.ts` | modelo de dados e `normalize()` (todo campo novo precisa de padrão aqui) |
-| `src/livros.ts`, `src/backup.ts`, `src/router.ts` | regras puras, com testes em `src/*.test.ts` |
+| `src/livros.ts`, `src/capitulos.ts`, `src/backup.ts`, `src/router.ts` | regras puras, com testes em `src/*.test.ts` |
 | `src/db.ts` | banco local (base copiada do CP Hub) |
 | `src/ui.tsx`, `src/Topo.tsx`, `src/Importar.tsx` | componentes de tela |
-| `src/telas/` | Biblioteca, NovoLivro, Painel, Lixeira, Ajustes, EmBreve |
+| `src/Editor.tsx` | editor de texto (TipTap, base copiada do CP Hub) |
+| `src/telas/` | Biblioteca, NovoLivro, Painel, Escrever, Lixeira, Ajustes, EmBreve |
 | `docs/` | Central, especificação, arquitetura, prévias |
 
 ## Comandos

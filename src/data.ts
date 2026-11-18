@@ -45,6 +45,34 @@ export interface Livro {
   editadoEm: number;
 }
 
+export type SituacaoCap = 'planejado' | 'escrita' | 'rascunho' | 'revisao' | 'concluido';
+export const SITUACOES_CAP: { v: SituacaoCap; l: string; tom: 'azul' | 'ambar' | 'verde' | 'violeta' | 'cinza' }[] = [
+  { v: 'planejado', l: 'Planejado', tom: 'azul' },
+  { v: 'escrita', l: 'Em escrita', tom: 'ambar' },
+  { v: 'rascunho', l: 'Rascunho', tom: 'cinza' },
+  { v: 'revisao', l: 'Em revisão', tom: 'violeta' },
+  { v: 'concluido', l: 'Concluído', tom: 'verde' },
+];
+
+/** Documento do editor (formato JSON do TipTap). */
+export type Doc = { type: string; content?: Doc[]; text?: string; attrs?: Record<string, unknown>; marks?: { type: string; attrs?: Record<string, unknown> }[] };
+
+export interface Capitulo {
+  id: string;
+  livroId: string;
+  /** Posição no livro (o número do capítulo acompanha a ordem). */
+  ordem: number;
+  titulo: string;
+  situacao: SituacaoCap;
+  conteudo: Doc | null;
+  palavras: number;
+  caracteres: number;
+  /** Final do texto, para o "Parou em…" do painel. */
+  trecho: string;
+  criadoEm: number;
+  editadoEm: number;
+}
+
 export interface Ajustes {
   barraRecolhe: boolean;
   tema: Tema;
@@ -52,7 +80,10 @@ export interface Ajustes {
 
 export interface Dados {
   versao: 1;
+  /** Quando foi gravado pela última vez (para escolher a cópia mais nova ao abrir). */
+  salvoEm: number;
   livros: Livro[];
+  capitulos: Capitulo[];
   ajustes: Ajustes;
 }
 
@@ -84,6 +115,31 @@ export function normalizeLivro(raw: unknown, agora = Date.now()): Livro | null {
   };
 }
 
+function normalizeDoc(v: unknown): Doc | null {
+  return v && typeof v === 'object' && (v as Doc).type === 'doc' ? (v as Doc) : null;
+}
+
+export function normalizeCapitulo(raw: unknown, agora = Date.now()): Capitulo | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const id = str(r.id), livroId = str(r.livroId);
+  if (!id || !livroId) return null;
+  const criadoEm = num(r.criadoEm, agora);
+  return {
+    id,
+    livroId,
+    ordem: num(r.ordem, 0),
+    titulo: str(r.titulo),
+    situacao: oneOf(r.situacao, SITUACOES_CAP.map((s) => s.v), 'escrita'),
+    conteudo: normalizeDoc(r.conteudo),
+    palavras: Math.max(0, Math.floor(num(r.palavras, 0))),
+    caracteres: Math.max(0, Math.floor(num(r.caracteres, 0))),
+    trecho: str(r.trecho),
+    criadoEm,
+    editadoEm: num(r.editadoEm, criadoEm),
+  };
+}
+
 export function normalize(raw: unknown, agora = Date.now()): Dados {
   const r = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
   const a = r.ajustes && typeof r.ajustes === 'object' ? (r.ajustes as Record<string, unknown>) : {};
@@ -91,9 +147,16 @@ export function normalize(raw: unknown, agora = Date.now()): Dados {
   const livros = (Array.isArray(r.livros) ? r.livros : [])
     .map((l) => normalizeLivro(l, agora))
     .filter((l): l is Livro => !!l && !vistos.has(l.id) && !!vistos.add(l.id));
+  const vistosCap = new Set<string>();
+  const ids = new Set(livros.map((l) => l.id));
+  const capitulos = (Array.isArray(r.capitulos) ? r.capitulos : [])
+    .map((c) => normalizeCapitulo(c, agora))
+    .filter((c): c is Capitulo => !!c && ids.has(c.livroId) && !vistosCap.has(c.id) && !!vistosCap.add(c.id));
   return {
     versao: 1,
+    salvoEm: num(r.salvoEm, 0),
     livros,
+    capitulos,
     ajustes: {
       barraRecolhe: typeof a.barraRecolhe === 'boolean' ? a.barraRecolhe : AJUSTES_PADRAO.barraRecolhe,
       tema: oneOf(a.tema, ['escuro', 'claro', 'sistema'] as const, AJUSTES_PADRAO.tema),
