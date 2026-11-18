@@ -9,7 +9,8 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | F0 | Documentação e prévia geral | P | **Feito** (18/11) |
 | F1 | Esqueleto: Biblioteca, painel do livro, barras, lixeira, backup | M | anotado |
 | F2 | Capítulos + editor (fontes, cor da página, autosave, contador) | G | anotado |
-| F3 | Rascunhos + caixa de ideias (captura rápida, transferir) | M | anotado |
+| F3 | Rascunhos + caixa de ideias (captura rápida, transferir, **tags**, incluindo a tag "Cocriação IA") | M | anotado |
+| F3b | **Copiar para IA**: texto simples (capítulo, vários ou livro + guia + fichas + pedido pronto de coerência) para colar no chat da IA | P | anotado (prévia v2) |
 | F4 | Personagens e locais (fichas, relações, participações) | G | anotado |
 | F5 | Comandos `/` e conexões reversas | M | anotado |
 | F6 | Guia do livro + preparar contexto para IA | M | anotado |
@@ -26,7 +27,13 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 
 ## Caixa de entrada
 - Gmail só para os apps (dono dos projetos Google Cloud, conta da IA e servidor). Um projeto Google por app.
-- Decidir: Lixeira sai da barra da Biblioteca para dar lugar a "Descobrir" (comunidade)?
+- Decidir o 5º botão da barra da Biblioteca (hoje "A definir").
+
+## Decisões (18/11/2026)
+- Barra da Biblioteca: Biblioteca · Ideias · **+** · Publicar · (a definir). Lixeira saiu da barra e virou filtro dentro da Biblioteca. Busca fica na lupa do topo.
+- Comunidade (Publicar) e IA dentro do app aparecem como **"Em breve"**.
+- No editor, o botão de IA virou **Copiar p/ IA** (funciona sem servidor).
+- Branch `main` criado.
 
 ## Feito
 - F0: documentação inicial e prévia geral (18/11/2026).

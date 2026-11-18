@@ -102,6 +102,11 @@ Vários livros; dados de um livro **nunca** se misturam com os de outro. Navegar
 - Revisão em etapas (futuro): estrutural, narrativa, estilo, final.
 
 ## 14. IA (sem API no início)
+- **Copiar para IA (primeiro passo):** escolhe o que copiar (capítulo, vários, livro inteiro), o que
+  incluir (guia, fichas citadas, resumos) e um pedido pronto (coerência, continuidade, correção, estilo
+  ou livre). Gera texto simples, como copiar de um chat, para colar no ChatGPT/Claude.
+- Ideias podem levar **tags**; a tag "Cocriação IA" marca o que se quer desenvolver com a IA.
+- IA dentro do app e comunidade aparecem como "Em breve".
 - "Preparar contexto": junta guia, personagens e locais escolhidos + pedido do autor → prompt para copiar.
 - Resposta colada vira **novo rascunho**. Nunca substitui texto original.
 
