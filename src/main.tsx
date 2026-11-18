@@ -7,6 +7,7 @@ import '@fontsource/literata/400.css';
 import '@fontsource/literata/400-italic.css';
 import '@fontsource/literata/500.css';
 import '@fontsource/literata/600.css';
+import '@fontsource/caveat/500.css';
 import './styles.css';
 import { App } from './App.tsx';
 
