@@ -5,6 +5,7 @@
 | 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 a v3 vistas; **v4** (mesmo link) aguardando opinião |
 | 18/11/2026 | P2: criar livro (2 passos), painel do livro, guia do livro | https://claude.ai/artifact/GxHg39W2rZeaJx2bJ7s7tk | `docs/previas/livro.html` | v1 aguardando opinião |
 | 18/11/2026 | P3: editor completo | https://claude.ai/artifact/E8cZSQG26QuA3BWShxnCKi | `docs/previas/editor.html` | v1 aguardando opinião |
+| 18/11/2026 | P4: capítulos, cenas e rascunhos | https://claude.ai/artifact/Fju1XY1PfuHYsenzch2r8t | `docs/previas/capitulos.html` | v1 aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -41,3 +42,15 @@
 - **Tocar numa referência:** resumo da ficha, "aparece em" e botões Abrir ficha / Editar.
 - **+** no editor: inserir personagem, local, clima, objeto, evento, cena, manuscrito, separador, imagem, rascunho, ideia.
 - Rodapé: palavras e caracteres ao vivo. No celular real, a barra de formatação fica presa acima do teclado.
+
+## P4: capítulos, cenas e rascunhos (v1)
+- Abas no topo: **Capítulos · Rascunhos · Estrutura**.
+- **Capítulos:** filtro por situação, totais (capítulos, cenas, palavras), cenas abrem embaixo do capítulo (▾),
+  **Reordenar** com ▲▼ (números atualizam sozinhos), ⋯ com renomear, duplicar, histórico, arquivar, excluir
+  (as cenas vão junto; rascunhos ligados ficam e só perdem o vínculo).
+- **Página do capítulo:** Escrever, situação, resumo, objetivo narrativo, "Quem e onde" preenchido pelas referências do texto,
+  cenas, rascunhos ligados, histórico.
+- **Cena:** momento, clima, quem participa e o **modelo opcional de 6 perguntas** (pode esconder).
+- **Rascunhos:** filtro (sem capítulo, por tag), vínculo opcional ("Sem capítulo (tudo bem)"),
+  **Transferir para capítulo** (escolher capítulo, no fim / no início / como nova cena, manter o original ligado por padrão), Copiar p/ IA.
+- **Estrutura:** marcos do modelo (Três atos) com capítulos ligados; o Quadro narrativo fica para a F9.
