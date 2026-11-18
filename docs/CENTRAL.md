@@ -1,13 +1,13 @@
 # Central do BookStation
 
 ## Situação
-Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em `PREVIAS.md`.
+F1 construída (v0.1.0, 18/11/2026). Próxima da fila: **F2 Editor** (parte 1).
 
 ## Fases sugeridas (cada uma é um item; tamanho P/M/G)
 | # | Item | Tamanho | Situação |
 |---|---|---|---|
 | F0 | Documentação e prévia geral | P | **Feito** (18/11) |
-| F1 | Esqueleto: Biblioteca, painel do livro, barras, lixeira, backup | M | anotado |
+| F1 | Esqueleto: Biblioteca, painel do livro, barras, lixeira, backup | M | **feito** (v0.1.0, PR #1) |
 | F2 | Capítulos + editor (fontes, cor da página, autosave, contador) | G | anotado |
 | F3 | Rascunhos + caixa de ideias (captura rápida, transferir, **tags**, incluindo a tag "Cocriação IA") | M | anotado |
 | F3b | **Copiar para IA**: texto simples (capítulo, vários ou livro + guia + fichas + pedido pronto de coerência) para colar no chat da IA | P | anotado (prévia v2) |
@@ -36,7 +36,7 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 
 ## Fila aprovada (18/11/2026: todas as prévias P1 a P7 aprovadas)
 Ordem de construção, uma fase por PR, seguindo as prévias como planta:
-1. **F1** Esqueleto: Biblioteca, criar livro, painel do livro, barras, Ajustes básicos, lixeira, backup (P1, P2) · M
+1. ~~**F1** Esqueleto~~ feito (v0.1.0): Biblioteca, criar livro, painel do livro, barras, Ajustes básicos, lixeira, backup (P1, P2) · M
 2. **F2** Editor (P3) · G, dividir em 2 PRs (texto e formatação; aparência, histórico, busca, foco)
 3. **F3 + F3b** Ideias com tags, rascunhos, Copiar para IA (P1, P4) · M
 4. **F4** Capítulos, cenas, estrutura (P4) · M
@@ -63,3 +63,4 @@ F12 comunidade real com servidor (só com F12a: diretrizes e LGPD revisadas).
 
 ## Feito
 - F0: documentação inicial e prévia geral (18/11/2026).
+- F1: esqueleto do app, v0.1.0 (18/11/2026), PR #1. Para publicar: GitHub › Settings › Pages › Source: **GitHub Actions** (uma vez só).
