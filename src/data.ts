@@ -86,6 +86,31 @@ export interface Capitulo {
   editadoEm: number;
 }
 
+/** Ideia da caixa de entrada: livroId null = ideia solta (ainda sem livro). */
+export interface Ideia {
+  id: string;
+  livroId: string | null;
+  texto: string;
+  tags: string[];
+  arquivada: boolean;
+  criadoEm: number;
+}
+
+export interface Rascunho {
+  id: string;
+  livroId: string;
+  titulo: string;
+  conteudo: Doc | null;
+  tags: string[];
+  /** Capítulo ligado (opcional: pode ficar sem para sempre). */
+  capituloId: string | null;
+  palavras: number;
+  criadoEm: number;
+  editadoEm: number;
+}
+
+export const TAGS_PADRAO = ['Cocriação IA', 'Diálogo', 'Cena', 'Reviravolta', 'Personagem', 'Lugar', 'Frase'];
+
 export interface Ajustes {
   barraRecolhe: boolean;
   tema: Tema;
@@ -98,6 +123,8 @@ export interface Dados {
   livros: Livro[];
   capitulos: Capitulo[];
   versoes: Versao[];
+  ideias: Ideia[];
+  rascunhos: Rascunho[];
   ajustes: Ajustes;
 }
 
@@ -181,12 +208,29 @@ export function normalize(raw: unknown, agora = Date.now()): Dados {
     const x = v as Versao;
     return !!x && typeof x === 'object' && typeof x.id === 'string' && capIds.has(x.capId) && typeof x.quando === 'number' && normalizeDoc(x.conteudo) !== null;
   }).map((v) => ({ ...v, nome: str(v.nome), palavras: num(v.palavras, 0), livroId: str(v.livroId) }));
+  const tags = (v: unknown) => (Array.isArray(v) ? [...new Set(v.filter((t): t is string => typeof t === 'string' && !!t.trim()))] : []);
+  const ideias: Ideia[] = (Array.isArray(r.ideias) ? r.ideias : []).flatMap((x) => {
+    const i = x && typeof x === 'object' ? (x as Record<string, unknown>) : null;
+    if (!i || !str(i.id) || !str(i.texto).trim()) return [];
+    const livroId = typeof i.livroId === 'string' && ids.has(i.livroId) ? i.livroId : null;
+    if (i.livroId && !livroId) return [];
+    return [{ id: str(i.id), livroId, texto: str(i.texto), tags: tags(i.tags), arquivada: i.arquivada === true, criadoEm: num(i.criadoEm, agora) }];
+  });
+  const rascunhos: Rascunho[] = (Array.isArray(r.rascunhos) ? r.rascunhos : []).flatMap((x) => {
+    const i = x && typeof x === 'object' ? (x as Record<string, unknown>) : null;
+    if (!i || !str(i.id) || !ids.has(str(i.livroId))) return [];
+    const criadoEm = num(i.criadoEm, agora);
+    const capituloId = typeof i.capituloId === 'string' && capitulos.some((c) => c.id === i.capituloId && c.livroId === i.livroId) ? i.capituloId : null;
+    return [{ id: str(i.id), livroId: str(i.livroId), titulo: str(i.titulo), conteudo: normalizeDoc(i.conteudo), tags: tags(i.tags), capituloId, palavras: Math.max(0, num(i.palavras, 0)), criadoEm, editadoEm: num(i.editadoEm, criadoEm) }];
+  });
   return {
     versao: 1,
     salvoEm: num(r.salvoEm, 0),
     livros,
     capitulos,
     versoes,
+    ideias,
+    rascunhos,
     ajustes: {
       barraRecolhe: typeof a.barraRecolhe === 'boolean' ? a.barraRecolhe : AJUSTES_PADRAO.barraRecolhe,
       tema: oneOf(a.tema, ['escuro', 'claro', 'sistema'] as const, AJUSTES_PADRAO.tema),

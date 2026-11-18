@@ -1,7 +1,7 @@
 # Central do BookStation
 
 ## Situação
-F2 completa (v0.3.0, 19/11/2026). Próxima da fila: **F3 + F3b** (ideias com tags, rascunhos, Copiar para IA).
+F3 + F3b construídas (v0.4.0, 19/11/2026). Próxima da fila: **F4** (capítulos, cenas e estrutura).
 
 ## Fases sugeridas (cada uma é um item; tamanho P/M/G)
 | # | Item | Tamanho | Situação |
@@ -9,8 +9,8 @@ F2 completa (v0.3.0, 19/11/2026). Próxima da fila: **F3 + F3b** (ideias com tag
 | F0 | Documentação e prévia geral | P | **Feito** (18/11) |
 | F1 | Esqueleto: Biblioteca, painel do livro, barras, lixeira, backup | M | **feito** (v0.1.0, PR #2) |
 | F2 | Capítulos + editor (fontes, cor da página, autosave, contador) | G | **feito** (v0.2.0 e v0.3.0) |
-| F3 | Rascunhos + caixa de ideias (captura rápida, transferir, **tags**, incluindo a tag "Cocriação IA") | M | anotado |
-| F3b | **Copiar para IA**: texto simples (capítulo, vários ou livro + guia + fichas + pedido pronto de coerência) para colar no chat da IA | P | anotado (prévia v2) |
+| F3 | Rascunhos + caixa de ideias (captura rápida, transferir, **tags**, incluindo a tag "Cocriação IA") | M | **feito** (v0.4.0) |
+| F3b | **Copiar para IA**: texto simples (capítulo, vários ou livro + guia + fichas + pedido pronto de coerência) para colar no chat da IA | P | **feito** (v0.4.0; guia e fichas entram na F5/F6) |
 | F4 | Personagens e locais (fichas, relações, participações) | G | anotado |
 | F5 | Comandos `/` e conexões reversas | M | anotado |
 | F6 | Guia do livro + preparar contexto para IA | M | anotado |
@@ -38,7 +38,7 @@ F2 completa (v0.3.0, 19/11/2026). Próxima da fila: **F3 + F3b** (ideias com tag
 Ordem de construção, uma fase por PR, seguindo as prévias como planta:
 1. ~~**F1** Esqueleto~~ feito (v0.1.0): Biblioteca, criar livro, painel do livro, barras, Ajustes básicos, lixeira, backup (P1, P2) · M
 2. **F2** Editor (P3) · G: ~~parte 1~~ v0.2.0, ~~parte 2 (aparência, manuscrito, histórico, busca, foco, atalhos)~~ v0.3.0
-3. **F3 + F3b** Ideias com tags, rascunhos, Copiar para IA (P1, P4) · M
+3. ~~**F3 + F3b** Ideias com tags, rascunhos, Copiar para IA~~ feito v0.4.0
 4. **F4** Capítulos, cenas, estrutura (P4) · M
 5. **F5** Fichas e relações + comandos `/` e "aparece em" (P5, P3) · G, dividir
 6. **F6** Guia do livro completo + contexto para IA (P2) · P
@@ -66,3 +66,5 @@ F12 comunidade real com servidor (só com F12a: diretrizes e LGPD revisadas).
 - F1: esqueleto do app, v0.1.0 (18/11/2026), PR #2. Publicação ligada em 18/11: Pages com Source **GitHub Actions** e, como o branch padrão é o de trabalho, regra em Settings › Environments › github-pages permitindo publicar do `main`.
 - F2 parte 1: editor de capítulos, v0.2.0 (19/11/2026). Gravação imediata + cópia de emergência ao fechar.
 - F2 parte 2: aparência por livro, manuscrito, busca, histórico de versões, modo foco, atalhos, v0.3.0 (19/11/2026).
+- Correção (19/11): no celular, barra de formatação presa ao rolar com o teclado aberto; barra de baixo some ao digitar; barra de cima sólida.
+- F3 + F3b: ideias com tags, ideias soltas, rascunhos, transferir, trazer rascunho, Copiar para IA e colar resposta, v0.4.0 (19/11/2026).

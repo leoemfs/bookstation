@@ -51,18 +51,4 @@ export function semOrfas(vs: Versao[], capIds: Set<string>): Versao[] {
 }
 
 /** Texto simples de um documento (para ver a versão). */
-export function textoDe(doc: Doc | null): string {
-  if (!doc) return '';
-  const blocos: string[] = [];
-  const andar = (n: Doc, buf: string[]) => {
-    if (n.text) buf.push(n.text);
-    for (const c of n.content ?? []) andar(c, buf);
-  };
-  for (const b of doc.content ?? []) {
-    if (b.type === 'horizontalRule') { blocos.push('⁂'); continue; }
-    const buf: string[] = [];
-    andar(b, buf);
-    blocos.push(buf.join(''));
-  }
-  return blocos.join('\n');
-}
+export { textoDoc as textoDe } from './ideias.ts';

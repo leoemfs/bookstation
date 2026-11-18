@@ -13,6 +13,10 @@ import { Lixeira } from './telas/Lixeira.tsx';
 import { NovoLivro } from './telas/NovoLivro.tsx';
 import { Painel } from './telas/Painel.tsx';
 const Escrever = lazy(() => import('./telas/Escrever.tsx').then((m) => ({ default: m.Escrever })));
+const RascunhoTela = lazy(() => import('./telas/RascunhoTela.tsx').then((m) => ({ default: m.RascunhoTela })));
+import { CapturaIdeia, Ideias } from './telas/Ideias.tsx';
+import { criarRascunho, Rascunhos } from './telas/Rascunhos.tsx';
+import { CopiarIA } from './telas/CopiarIA.tsx';
 import { novoCapitulo, semOrfaos } from './capitulos.ts';
 import { semOrfas } from './versoes.ts';
 import { novoId } from './livros.ts';
@@ -25,6 +29,8 @@ export function App() {
   const [dados, setDados] = useState<Dados | null>(null);
   const [rota, setRota] = useState<Rota>(() => lerRota(location.hash));
   const [mais, setMais] = useState(false);
+  const [captura, setCaptura] = useState(false);
+  const [trazer, setTrazer] = useState(false);
   const [some, setSome] = useState(false);
   const avisouReserva = useRef(false);
   const atual = useRef<Dados | null>(null);
@@ -48,7 +54,7 @@ export function App() {
     const aoSair = () => { if (atual.current) gravarEmergencia(atual.current); };
     document.addEventListener('visibilitychange', aoFechar);
     addEventListener('pagehide', aoSair);
-    const onHash = () => { setRota(lerRota(location.hash)); setMais(false); scrollTo(0, 0); setSome(false); };
+    const onHash = () => { setRota(lerRota(location.hash)); setMais(false); setCaptura(false); setTrazer(false); scrollTo(0, 0); setSome(false); };
     addEventListener('hashchange', onHash);
     return () => {
       removeEventListener('hashchange', onHash);
@@ -72,6 +78,25 @@ export function App() {
     return () => mq.removeEventListener('change', aplicar);
   }, [tema]);
 
+  // Teclado do celular: barras acompanham a área visível; a barra de baixo sai enquanto digita.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const ajustar = () => document.documentElement.style.setProperty('--vv', `${Math.max(0, vv?.offsetTop ?? 0)}px`);
+    vv?.addEventListener('resize', ajustar);
+    vv?.addEventListener('scroll', ajustar);
+    const editavel = (el: EventTarget | null) => el instanceof HTMLElement && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'file', 'range'].includes((el as HTMLInputElement).type)));
+    const entrou = (e: FocusEvent) => { if (editavel(e.target) && matchMedia('(pointer: coarse)').matches) document.body.classList.add('digitando'); };
+    const saiu = () => setTimeout(() => { if (!editavel(document.activeElement)) document.body.classList.remove('digitando'); }, 50);
+    addEventListener('focusin', entrou);
+    addEventListener('focusout', saiu);
+    return () => {
+      vv?.removeEventListener('resize', ajustar);
+      vv?.removeEventListener('scroll', ajustar);
+      removeEventListener('focusin', entrou);
+      removeEventListener('focusout', saiu);
+    };
+  }, []);
+
   // barra de baixo some ao rolar para baixo e volta ao subir
   const recolhe = dados?.ajustes.barraRecolhe ?? true;
   useEffect(() => {
@@ -90,7 +115,15 @@ export function App() {
     let n = { ...fn(d), salvoEm: Date.now() };
     // capítulos de livros que saíram de vez também saem
     if (n.livros !== d.livros) n = { ...n, capitulos: semOrfaos(n.capitulos, new Set(n.livros.map((l) => l.id))) };
-    if (n.capitulos !== d.capitulos && n.versoes.length) n = { ...n, versoes: semOrfas(n.versoes, new Set(n.capitulos.map((c) => c.id))) };
+    if (n.livros !== d.livros) {
+      const ls = new Set(n.livros.map((l) => l.id));
+      n = { ...n, ideias: n.ideias.filter((i) => !i.livroId || ls.has(i.livroId)), rascunhos: n.rascunhos.filter((r) => ls.has(r.livroId)) };
+    }
+    if (n.capitulos !== d.capitulos) {
+      const cs = new Set(n.capitulos.map((c) => c.id));
+      if (n.versoes.length) n = { ...n, versoes: semOrfas(n.versoes, cs) };
+      if (n.rascunhos.some((r) => r.capituloId && !cs.has(r.capituloId))) n = { ...n, rascunhos: n.rascunhos.map((r) => (r.capituloId && !cs.has(r.capituloId) ? { ...r, capituloId: null } : r)) };
+    }
     atual.current = n;
     setDados(n);
     dbSet(CHAVE, n).then((r) => {
@@ -99,11 +132,11 @@ export function App() {
     pedirPersistencia();
   };
 
-  const noLivro = rota.tela === 'livro' || rota.tela === 'area' || rota.tela === 'editor';
+  const noLivro = rota.tela === 'livro' || rota.tela === 'area' || rota.tela === 'editor' || rota.tela === 'rascunho' || rota.tela === 'ia';
   const noEditor = rota.tela === 'editor';
   const livroId = noLivro ? rota.id : '';
   const barra: [IconName, string, Rota | null | (() => void)][] = noEditor
-    ? [['lista', 'Capítulos', { tela: 'area', id: livroId, area: 'capitulos' }], ['pessoa', 'Fichas', { tela: 'area', id: livroId, area: 'fichas' }], ['mais', '', null], ['copia', 'Copiar p/ IA', () => avisar('Copiar para IA chega na F3')], ['livro', 'Ler', () => avisar('A leitura chega na F8')]]
+    ? [['lista', 'Capítulos', { tela: 'area', id: livroId, area: 'capitulos' }], ['pessoa', 'Fichas', { tela: 'area', id: livroId, area: 'fichas' }], ['mais', '', null], ['copia', 'Copiar p/ IA', { tela: 'ia', id: livroId, alvo: `cap.${rota.cap}` }], ['livro', 'Ler', () => avisar('A leitura chega na F8')]]
     : noLivro
     ? [['casa', 'Painel', { tela: 'livro', id: livroId }], ['lista', 'Capítulos', { tela: 'area', id: livroId, area: 'capitulos' }], ['mais', '', null], ['pessoa', 'Fichas', { tela: 'area', id: livroId, area: 'fichas' }], ['ideia', 'Ideias', { tela: 'area', id: livroId, area: 'ideias' }]]
     : [['lib', 'Biblioteca', { tela: 'biblioteca' }], ['ideia', 'Ideias', { tela: 'ideias' }], ['mais', '', null], ['globo', 'Comunidade', { tela: 'comunidade' }], ['engrenagem', 'Ajustes', { tela: 'ajustes' }]];
@@ -122,11 +155,16 @@ export function App() {
       {rota.tela === 'biblioteca' && <Biblioteca />}
       {rota.tela === 'novo' && <NovoLivro />}
       {rota.tela === 'livro' && <Painel id={rota.id} key={rota.id} />}
-      {rota.tela === 'area' && <EmBreve area={rota.area} livroId={rota.id} />}
+      {rota.tela === 'area' && rota.area === 'ideias' && <Ideias livroId={rota.id} key={rota.id} />}
+      {rota.tela === 'area' && rota.area === 'rascunhos' && <Rascunhos livroId={rota.id} />}
+      {rota.tela === 'area' && rota.area !== 'ideias' && rota.area !== 'rascunhos' && <EmBreve area={rota.area} livroId={rota.id} />}
+      {rota.tela === 'rascunho' && <Suspense fallback={null}><RascunhoTela livroId={rota.id} rascId={rota.rasc} key={rota.rasc} /></Suspense>}
+      {rota.tela === 'ia' && <CopiarIA livroId={rota.id} alvo={rota.alvo} key={rota.alvo} />}
       {rota.tela === 'editor' && <Suspense fallback={null}><Escrever livroId={rota.id} capId={rota.cap} key={rota.cap} /></Suspense>}
       {rota.tela === 'lixeira' && <Lixeira />}
       {rota.tela === 'ajustes' && <Ajustes />}
-      {(rota.tela === 'ideias' || rota.tela === 'comunidade') && <EmBreve area={rota.tela} />}
+      {rota.tela === 'ideias' && <Ideias livroId={null} key="soltas" />}
+      {rota.tela === 'comunidade' && <EmBreve area="comunidade" />}
 
       {rota.tela !== 'novo' && (
         <nav className={`tabbar${some ? ' some' : ''}`} aria-label="Navegação">
@@ -151,14 +189,18 @@ export function App() {
                 <button className="act" onClick={inserir(() => edAtivo.editor?.chain().focus().toggleBlockquote().run())}><span className="ic" style={{ fontSize: 18 }}>❝</span>Citação</button>
                 <button className="act" onClick={inserir(() => { if (edAtivo.editor) alternarManuscrito(edAtivo.editor); })}><span className="ic" style={{ fontFamily: 'var(--f-mao)', fontSize: 20 }}>Aa</span>Bloco manuscrito</button>
                 <button className="act" onClick={novoCap}><span className="ic"><Icon n="lista" /></span>Novo capítulo</button>
-                {([['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['clima', 'Clima', 'F5'], ['rascunho', 'Trazer rascunho', 'F3'], ['ideia', 'Ideia rápida', 'F3']] as [IconName, string, string][]).map(([ic, t, f]) => (
+                <button className="act" onClick={() => { setMais(false); setTrazer(true); }}><span className="ic"><Icon n="rascunho" /></span>Trazer rascunho</button>
+                <button className="act" onClick={() => { setMais(false); setCaptura(true); }}><span className="ic"><Icon n="ideia" /></span>Ideia rápida</button>
+                {([['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['clima', 'Clima', 'F5']] as [IconName, string, string][]).map(([ic, t, f]) => (
                   <button key={t} className="act breve" onClick={breve(f)}><span className="ic"><Icon n={ic} /></span>{t}<small>em breve</small></button>
                 ))}
               </>
             ) : noLivro ? (
               <>
                 <button className="act" onClick={novoCap}><span className="ic"><Icon n="lista" /></span>Capítulo</button>
-                {([['ideia', 'Ideia rápida', 'F3'], ['rascunho', 'Rascunho', 'F3'], ['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['imagem', 'Imagem', 'F5']] as [IconName, string, string][]).map(([ic, t, f]) => (
+                <button className="act" onClick={() => { setMais(false); setCaptura(true); }}><span className="ic"><Icon n="ideia" /></span>Ideia rápida</button>
+                <button className="act" onClick={() => { setMais(false); const id = criarRascunho(mudar, livroId); ir({ tela: 'rascunho', id: livroId, rasc: id }); }}><span className="ic"><Icon n="rascunho" /></span>Rascunho</button>
+                {([['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['imagem', 'Imagem', 'F5']] as [IconName, string, string][]).map(([ic, t, f]) => (
                   <button key={t} className="act breve" onClick={breve(f)}><span className="ic"><Icon n={ic} /></span>{t}<small>em breve</small></button>
                 ))}
                 <div className="sep" />
@@ -167,10 +209,27 @@ export function App() {
             ) : (
               <>
                 <button className="act" onClick={() => { setMais(false); ir({ tela: 'novo' }); }}><span className="ic"><Icon n="livro" /></span>Novo livro</button>
-                <button className="act breve" onClick={breve('F3')}><span className="ic"><Icon n="ideia" /></span>Ideia solta<small>em breve</small></button>
+                <button className="act" onClick={() => { setMais(false); setCaptura(true); }}><span className="ic"><Icon n="ideia" /></span>Ideia solta</button>
                 <Importar className="act"><span className="ic"><Icon n="enviar" /></span>Importar backup</Importar>
               </>
             )}
+          </div>
+        </Sheet>
+      )}
+      {captura && (
+        <Sheet titulo={noLivro ? 'Ideia rápida' : 'Ideia solta'} onClose={() => setCaptura(false)}>
+          <CapturaIdeia livroId={noLivro ? livroId : null} autoFocus aoSalvar={() => setCaptura(false)} />
+        </Sheet>
+      )}
+      {trazer && (
+        <Sheet titulo="Trazer rascunho para o capítulo" onClose={() => setTrazer(false)}>
+          <div className="menu">
+            {dados.rascunhos.filter((r) => r.livroId === livroId).sort((a, b) => b.editadoEm - a.editadoEm).map((r) => (
+              <button key={r.id} onClick={() => { setTrazer(false); const doc = r.conteudo; setTimeout(() => { if (doc?.content?.length) edAtivo.editor?.chain().focus().insertContent(doc.content).run(); avisar('Rascunho trazido. O original continua guardado.'); }, 0); }}>
+                <span className="ic"><Icon n="rascunho" /></span>{r.titulo || 'Sem título'}<span className="meta" style={{ marginLeft: 'auto' }}>{r.palavras}</span>
+              </button>
+            ))}
+            {!dados.rascunhos.some((r) => r.livroId === livroId) && <div className="meta" style={{ padding: 10 }}>Este livro ainda não tem rascunhos.</div>}
           </div>
         </Sheet>
       )}

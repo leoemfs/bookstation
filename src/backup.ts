@@ -1,6 +1,5 @@
 /** Backup em arquivo: exportar tudo (ou um livro) e importar de volta. */
-import { normalize, normalizeCapitulo, normalizeLivro, type Capitulo, type Dados, type Livro } from './data.ts';
-import { copiarCapitulos } from './capitulos.ts';
+import { normalize, normalizeLivro, type Capitulo, type Dados, type Ideia, type Livro, type Rascunho } from './data.ts';
 
 export const APP = 'bookstation';
 
@@ -8,11 +7,13 @@ export function exportar(dados: Dados, agora: number): string {
   return JSON.stringify({ app: APP, tipo: 'tudo', exportadoEm: new Date(agora).toISOString(), dados }, null, 1);
 }
 
-export function exportarLivro(livro: Livro, capitulos: Capitulo[], agora: number): string {
-  return JSON.stringify({ app: APP, tipo: 'livro', exportadoEm: new Date(agora).toISOString(), livro, capitulos: capitulos.filter((c) => c.livroId === livro.id) }, null, 1);
+export function exportarLivro(livro: Livro, d: Pick<Dados, 'capitulos' | 'ideias' | 'rascunhos'>, agora: number): string {
+  const doLivro = <T extends { livroId: string | null }>(xs: T[]) => xs.filter((x) => x.livroId === livro.id);
+  return JSON.stringify({ app: APP, tipo: 'livro', exportadoEm: new Date(agora).toISOString(), livro, capitulos: doLivro(d.capitulos), ideias: doLivro(d.ideias), rascunhos: doLivro(d.rascunhos) }, null, 1);
 }
 
-export type Importado = { tipo: 'tudo'; dados: Dados } | { tipo: 'livro'; livro: Livro; capitulos: Capitulo[] };
+export interface PacoteLivro { livro: Livro; capitulos: Capitulo[]; ideias: Ideia[]; rascunhos: Rascunho[] }
+export type Importado = { tipo: 'tudo'; dados: Dados } | ({ tipo: 'livro' } & PacoteLivro);
 
 /** Lê um arquivo de backup. Erros vêm com mensagem para mostrar à pessoa. */
 export function importar(texto: string, agora: number): Importado {
@@ -27,19 +28,23 @@ export function importar(texto: string, agora: number): Importado {
   if (r.tipo === 'livro') {
     const livro = normalizeLivro(r.livro, agora);
     if (!livro) throw new Error('O livro deste arquivo está incompleto.');
-    const capitulos = (Array.isArray(r.capitulos) ? r.capitulos : []).map((c) => normalizeCapitulo(c, agora)).filter((c): c is Capitulo => !!c && c.livroId === livro.id);
-    return { tipo: 'livro', livro, capitulos };
+    // usa o normalize geral para validar capítulos, ideias e rascunhos do pacote
+    const d = normalize({ livros: [livro], capitulos: r.capitulos, ideias: r.ideias, rascunhos: r.rascunhos }, agora);
+    return { tipo: 'livro', livro, capitulos: d.capitulos, ideias: d.ideias, rascunhos: d.rascunhos };
   }
   return { tipo: 'tudo', dados: normalize(r.dados, agora) };
 }
 
-/** Junta um livro importado (com os capítulos) sem apagar nada: entra sempre com ids novos. */
-export function juntarLivro(dados: Dados, livro: Livro, capitulos: Capitulo[], novoId: () => string): Dados {
+/** Junta um livro importado (com capítulos, ideias e rascunhos) sem apagar nada: entra sempre com ids novos. */
+export function juntarLivro(dados: Dados, p: PacoteLivro, novoId: () => string): Dados {
   const id = novoId();
+  const capIds = new Map(p.capitulos.map((c) => [c.id, novoId()]));
   return {
     ...dados,
-    livros: [{ ...livro, id, excluidoEm: null }, ...dados.livros],
-    capitulos: [...dados.capitulos, ...copiarCapitulos(capitulos, livro.id, id, novoId)],
+    livros: [{ ...p.livro, id, excluidoEm: null }, ...dados.livros],
+    capitulos: [...dados.capitulos, ...p.capitulos.map((c) => ({ ...c, id: capIds.get(c.id)!, livroId: id }))],
+    ideias: [...dados.ideias, ...p.ideias.map((i) => ({ ...i, id: novoId(), livroId: id }))],
+    rascunhos: [...dados.rascunhos, ...p.rascunhos.map((r) => ({ ...r, id: novoId(), livroId: id, capituloId: r.capituloId ? capIds.get(r.capituloId) ?? null : null }))],
   };
 }
 
