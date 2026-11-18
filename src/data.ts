@@ -51,6 +51,8 @@ export interface Livro {
   roteiro: Roteiro;
   /** Como o texto aparece no editor (vale só para este livro). */
   aparencia: Aparencia;
+  /** Estrutura narrativa: marco do roteiro → capítulos ligados. */
+  estrutura: Record<string, string[]>;
   arquivado: boolean;
   /** Quando foi para a lixeira (ms) ou null. */
   excluidoEm: number | null;
@@ -82,9 +84,35 @@ export interface Capitulo {
   caracteres: number;
   /** Final do texto, para o "Parou em…" do painel. */
   trecho: string;
+  resumo: string;
+  /** O que este capítulo precisa mudar na história. */
+  objetivo: string;
+  /** Arquivado: sai da lista e da numeração, mas não é apagado. */
+  arquivado: boolean;
+  /** Na lixeira desde (ms) ou null. */
+  excluidoEm: number | null;
   criadoEm: number;
   editadoEm: number;
 }
+
+/** Cena: unidade de planejamento dentro do capítulo (o texto fica no capítulo). */
+export interface Cena {
+  id: string;
+  livroId: string;
+  capituloId: string;
+  ordem: number;
+  titulo: string;
+  /** Momento cronológico (ex.: "Dia 1, manhã"). */
+  momento: string;
+  clima: string;
+  resumo: string;
+  /** Respostas do modelo opcional: onde, quem, desejo, obstáculo, o que acontece, o que muda. */
+  perguntas: string[];
+  mostrarModelo: boolean;
+  criadoEm: number;
+  editadoEm: number;
+}
+export const PERGUNTAS_CENA = ['Onde a cena acontece?', 'Quem participa?', 'O que a personagem deseja agora?', 'Qual obstáculo aparece?', 'O que acontece?', 'O que muda depois dela?'];
 
 /** Ideia da caixa de entrada: livroId null = ideia solta (ainda sem livro). */
 export interface Ideia {
@@ -122,6 +150,7 @@ export interface Dados {
   salvoEm: number;
   livros: Livro[];
   capitulos: Capitulo[];
+  cenas: Cena[];
   versoes: Versao[];
   ideias: Ideia[];
   rascunhos: Rascunho[];
@@ -133,6 +162,13 @@ export const AJUSTES_PADRAO: Ajustes = { barraRecolhe: true, tema: 'escuro' };
 const str = (v: unknown, d = '') => (typeof v === 'string' ? v : d);
 const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
 const oneOf = <T extends string>(v: unknown, ok: readonly T[], d: T): T => (ok.includes(v as T) ? (v as T) : d);
+
+function normalizeEstrutura(v: unknown): Record<string, string[]> {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {};
+  const out: Record<string, string[]> = {};
+  for (const [k, x] of Object.entries(v as Record<string, unknown>)) if (Array.isArray(x)) out[k] = x.filter((i): i is string => typeof i === 'string');
+  return out;
+}
 
 function normalizeAparencia(v: unknown): Aparencia {
   const a = v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
@@ -159,6 +195,7 @@ export function normalizeLivro(raw: unknown, agora = Date.now()): Livro | null {
     situacao: oneOf(r.situacao, SITUACOES.map((s) => s.v), 'planejamento'),
     roteiro: oneOf(r.roteiro, ROTEIROS.map((s) => s.v), 'livre'),
     aparencia: normalizeAparencia(r.aparencia),
+    estrutura: normalizeEstrutura(r.estrutura),
     arquivado: r.arquivado === true,
     excluidoEm: typeof r.excluidoEm === 'number' ? r.excluidoEm : null,
     criadoEm,
@@ -186,6 +223,10 @@ export function normalizeCapitulo(raw: unknown, agora = Date.now()): Capitulo | 
     palavras: Math.max(0, Math.floor(num(r.palavras, 0))),
     caracteres: Math.max(0, Math.floor(num(r.caracteres, 0))),
     trecho: str(r.trecho),
+    resumo: str(r.resumo),
+    objetivo: str(r.objetivo),
+    arquivado: r.arquivado === true,
+    excluidoEm: typeof r.excluidoEm === 'number' ? r.excluidoEm : null,
     criadoEm,
     editadoEm: num(r.editadoEm, criadoEm),
   };
@@ -223,11 +264,20 @@ export function normalize(raw: unknown, agora = Date.now()): Dados {
     const capituloId = typeof i.capituloId === 'string' && capitulos.some((c) => c.id === i.capituloId && c.livroId === i.livroId) ? i.capituloId : null;
     return [{ id: str(i.id), livroId: str(i.livroId), titulo: str(i.titulo), conteudo: normalizeDoc(i.conteudo), tags: tags(i.tags), capituloId, palavras: Math.max(0, num(i.palavras, 0)), criadoEm, editadoEm: num(i.editadoEm, criadoEm) }];
   });
+  const cenas: Cena[] = (Array.isArray(r.cenas) ? r.cenas : []).flatMap((x) => {
+    const i = x && typeof x === 'object' ? (x as Record<string, unknown>) : null;
+    if (!i || !str(i.id) || !capIds.has(str(i.capituloId))) return [];
+    const cap = capitulos.find((c) => c.id === i.capituloId)!;
+    const criadoEm = num(i.criadoEm, agora);
+    const pg = Array.isArray(i.perguntas) ? i.perguntas : [];
+    return [{ id: str(i.id), livroId: cap.livroId, capituloId: cap.id, ordem: num(i.ordem, 0), titulo: str(i.titulo), momento: str(i.momento), clima: str(i.clima), resumo: str(i.resumo), perguntas: PERGUNTAS_CENA.map((_, k) => str(pg[k])), mostrarModelo: i.mostrarModelo !== false, criadoEm, editadoEm: num(i.editadoEm, criadoEm) }];
+  });
   return {
     versao: 1,
     salvoEm: num(r.salvoEm, 0),
     livros,
     capitulos,
+    cenas,
     versoes,
     ideias,
     rascunhos,

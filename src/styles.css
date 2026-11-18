@@ -258,3 +258,36 @@ body.digitando main.escrever { padding-bottom: 40vh; }
 .rasc-linha { display: flex; gap: 8px; flex-wrap: wrap; }
 .export { width: 100%; margin-top: 16px; min-height: 220px; max-height: 340px; resize: vertical; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; font: 12.5px/1.5 ui-monospace, Menlo, monospace; color: var(--muted); }
 .soon { display: flex; flex-direction: column; gap: 4px; border-style: dashed; align-items: flex-start; }
+
+/* ---------- capítulos, cenas, estrutura (F4) ---------- */
+.abas { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 4px; margin-bottom: 14px; }
+.abas button { flex: 1; border: 0; background: none; color: var(--muted); border-radius: 10px; padding: 9px 4px; font-size: 13.5px; }
+.abas button.on { background: var(--raised); color: var(--text); font-weight: 500; }
+.barra-filtro { display: flex; gap: 8px; align-items: center; }
+.barra-filtro .row { flex: 1; min-width: 0; }
+.chip.fixo { flex: none; }
+.card.cap { padding: 10px 8px 10px 12px; }
+.card.cap.reord { border-style: dashed; }
+.cap-linha { display: flex; align-items: center; gap: 2px; }
+.cap-abrir { flex: 1; min-width: 0; display: flex; gap: 12px; align-items: center; background: none; border: 0; padding: 2px 0; text-align: left; color: var(--text); }
+.cap-abrir .info { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.cap-abrir b { font-size: 15px; }
+.num { flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--raised); display: grid; place-items: center; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mv { display: flex; flex-direction: column; gap: 3px; }
+.mv button { width: 36px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--raised); font-size: 12px; }
+.mv button:disabled { opacity: .3; }
+.cenas { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 2px 46px; }
+.cena { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; font-size: 13.5px; }
+.cena small { margin-left: auto; color: var(--faint); font-size: 12px; flex: none; }
+.cena.grande { padding: 12px; background: var(--surface); }
+.link-btn { background: none; border: 0; padding: 0; color: var(--accent); font-size: 12.5px; text-transform: none; letter-spacing: 0; }
+.campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.campo label { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.campo textarea { min-height: 64px; }
+.pergunta label b { flex: none; width: 22px; height: 22px; border-radius: 7px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 12px; }
+.titulo-cap { font: 600 19px var(--f-book); }
+.cap-cab { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.colb { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+.colb-cab { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; color: var(--muted); margin-bottom: 8px; }
+.tag.grande { font-size: 12.5px; padding: 6px 10px; border-radius: 10px; color: var(--text); }
+.tag.vazio-tag { background: none; border: 1px dashed var(--border-strong); color: var(--faint); }

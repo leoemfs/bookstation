@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { CAPAS, GENEROS, ROTEIROS, SITUACOES, type Livro } from '../data.ts';
-import { exportarLivro, nomeArquivo } from '../backup.ts';
+import { copiarConteudo, exportarLivro, nomeArquivo } from '../backup.ts';
 import { atualizar, duplicar, novoId, paraLixeira, quando } from '../livros.ts';
-import { copiarCapitulos, doLivro, novoCapitulo, numero, ultimoEditado } from '../capitulos.ts';
+import { doLivro, novoCapitulo, numero, ultimoEditado } from '../capitulos.ts';
 import { CAPS_TONS } from '../tons.ts';
 import { ir, useApp } from '../store.tsx';
 import { Topo } from '../Topo.tsx';
 import { avisar, baixarArquivo, Capa, comprimirImagem, Icon, PillSituacao, Sheet, type IconName } from '../ui.tsx';
 
 const AREAS: [IconName, string, string, string][] = [
-  ['lista', 'Capítulos', 'capitulos', 'lista completa na F4'],
+  ['lista', 'Capítulos', 'capitulos', ''],
   ['rascunho', 'Rascunhos', 'rascunhos', ''],
   ['ideia', 'Ideias', 'ideias', ''],
   ['pessoa', 'Personagens', 'personagens', 'chega na F5'],
@@ -119,7 +119,7 @@ export function Painel({ id }: { id: string }) {
             <button key={area} className="card tile" onClick={() => ir({ tela: 'area', id: l.id, area })}>
               <span className="ic"><Icon n={ic} /></span>
               <b>{nome}</b>
-              <small>{area === 'rascunhos' ? `${rascs.length} ${rascs.length === 1 ? 'rascunho' : 'rascunhos'}` : area === 'ideias' ? `${ideias.length} para organizar` : sub}</small>
+              <small>{area === 'capitulos' ? `${caps.length} · ${dados.cenas.filter((s) => caps.some((c) => c.id === s.capituloId)).length} cenas` : area === 'rascunhos' ? `${rascs.length} ${rascs.length === 1 ? 'rascunho' : 'rascunhos'}` : area === 'ideias' ? `${ideias.length} para organizar` : sub}</small>
             </button>
           ))}
         </div>
@@ -135,7 +135,7 @@ export function Painel({ id }: { id: string }) {
         <Sheet titulo={l.titulo} onClose={fechar}>
           <div className="menu">
             <button onClick={() => setFolha('editar')}><span className="ic"><Icon n="caneta" /></span>Editar título, gênero e capa</button>
-            <button onClick={() => { const nid = novoId(); mudar((d) => ({ ...d, livros: duplicar(d.livros, l.id, Date.now(), nid), capitulos: [...d.capitulos, ...copiarCapitulos(d.capitulos, l.id, nid, novoId, Date.now())] })); fechar(); avisar('Livro duplicado'); }}><span className="ic"><Icon n="copia" /></span>Duplicar livro</button>
+            <button onClick={() => { const nid = novoId(); mudar((d) => { const c = copiarConteudo(d, l.id, nid, novoId, Date.now()); return { ...d, livros: duplicar(d.livros, l.id, Date.now(), nid).map((x) => (x.id === nid ? { ...x, estrutura: c.estrutura } : x)), capitulos: c.capitulos, cenas: c.cenas }; }); fechar(); avisar('Livro duplicado'); }}><span className="ic"><Icon n="copia" /></span>Duplicar livro</button>
             <button onClick={() => { baixarArquivo(nomeArquivo(l.titulo, Date.now()), exportarLivro(l, dados, Date.now())); fechar(); avisar('Arquivo do livro baixado'); }}><span className="ic"><Icon n="baixar" /></span>Exportar este livro</button>
             <button onClick={() => { set({ arquivado: !l.arquivado }); fechar(); avisar(l.arquivado ? 'Livro voltou para a Biblioteca' : 'Livro arquivado'); }}><span className="ic"><Icon n="arquivo" /></span>{l.arquivado ? 'Desarquivar' : 'Arquivar'}</button>
             <button className="danger" onClick={() => setFolha('excluir')}><span className="ic"><Icon n="lixo" /></span>Excluir</button>

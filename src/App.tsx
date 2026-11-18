@@ -17,7 +17,11 @@ const RascunhoTela = lazy(() => import('./telas/RascunhoTela.tsx').then((m) => (
 import { CapturaIdeia, Ideias } from './telas/Ideias.tsx';
 import { criarRascunho, Rascunhos } from './telas/Rascunhos.tsx';
 import { CopiarIA } from './telas/CopiarIA.tsx';
-import { novoCapitulo, semOrfaos } from './capitulos.ts';
+import { Capitulos } from './telas/Capitulos.tsx';
+import { CapituloTela } from './telas/CapituloTela.tsx';
+import { CenaTela } from './telas/CenaTela.tsx';
+import { Estrutura } from './telas/Estrutura.tsx';
+import { limparCapsLixeira, novoCapitulo, semOrfaos } from './capitulos.ts';
 import { semOrfas } from './versoes.ts';
 import { novoId } from './livros.ts';
 import { ativo as edAtivo } from './editorAtivo.ts';
@@ -43,7 +47,7 @@ export function App() {
       const e = emerg ? normalize(emerg) : null;
       const d = e && e.salvoEm > banco.salvoEm ? e : banco;
       if (d === e) dbSet(CHAVE, e);
-      const ok = { ...d, livros: limparLixeira(d.livros, Date.now()) };
+      const ok = { ...d, livros: limparLixeira(d.livros, Date.now()), capitulos: limparCapsLixeira(d.capitulos, Date.now()) };
       atual.current = ok;
       setDados(ok);
     }, () => {
@@ -122,6 +126,7 @@ export function App() {
     if (n.capitulos !== d.capitulos) {
       const cs = new Set(n.capitulos.map((c) => c.id));
       if (n.versoes.length) n = { ...n, versoes: semOrfas(n.versoes, cs) };
+      if (n.cenas.some((c) => !cs.has(c.capituloId))) n = { ...n, cenas: n.cenas.filter((c) => cs.has(c.capituloId)) };
       if (n.rascunhos.some((r) => r.capituloId && !cs.has(r.capituloId))) n = { ...n, rascunhos: n.rascunhos.map((r) => (r.capituloId && !cs.has(r.capituloId) ? { ...r, capituloId: null } : r)) };
     }
     atual.current = n;
@@ -132,7 +137,7 @@ export function App() {
     pedirPersistencia();
   };
 
-  const noLivro = rota.tela === 'livro' || rota.tela === 'area' || rota.tela === 'editor' || rota.tela === 'rascunho' || rota.tela === 'ia';
+  const noLivro = rota.tela === 'livro' || rota.tela === 'area' || rota.tela === 'editor' || rota.tela === 'rascunho' || rota.tela === 'ia' || rota.tela === 'capitulo' || rota.tela === 'cena';
   const noEditor = rota.tela === 'editor';
   const livroId = noLivro ? rota.id : '';
   const barra: [IconName, string, Rota | null | (() => void)][] = noEditor
@@ -157,7 +162,11 @@ export function App() {
       {rota.tela === 'livro' && <Painel id={rota.id} key={rota.id} />}
       {rota.tela === 'area' && rota.area === 'ideias' && <Ideias livroId={rota.id} key={rota.id} />}
       {rota.tela === 'area' && rota.area === 'rascunhos' && <Rascunhos livroId={rota.id} />}
-      {rota.tela === 'area' && rota.area !== 'ideias' && rota.area !== 'rascunhos' && <EmBreve area={rota.area} livroId={rota.id} />}
+      {rota.tela === 'area' && rota.area === 'capitulos' && <Capitulos livroId={rota.id} />}
+      {rota.tela === 'area' && rota.area === 'estrutura' && <Estrutura livroId={rota.id} />}
+      {rota.tela === 'area' && !['ideias', 'rascunhos', 'capitulos', 'estrutura'].includes(rota.area) && <EmBreve area={rota.area} livroId={rota.id} />}
+      {rota.tela === 'capitulo' && <CapituloTela livroId={rota.id} capId={rota.cap} key={rota.cap} />}
+      {rota.tela === 'cena' && <CenaTela livroId={rota.id} cenaId={rota.cena} key={rota.cena} />}
       {rota.tela === 'rascunho' && <Suspense fallback={null}><RascunhoTela livroId={rota.id} rascId={rota.rasc} key={rota.rasc} /></Suspense>}
       {rota.tela === 'ia' && <CopiarIA livroId={rota.id} alvo={rota.alvo} key={rota.alvo} />}
       {rota.tela === 'editor' && <Suspense fallback={null}><Escrever livroId={rota.id} capId={rota.cap} key={rota.cap} /></Suspense>}

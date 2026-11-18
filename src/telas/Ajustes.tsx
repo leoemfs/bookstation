@@ -3,6 +3,7 @@ import type { Ajustes as A, Tema } from '../data.ts';
 import { exportar, nomeArquivo } from '../backup.ts';
 import { espacoUsado } from '../db.ts';
 import { naLixeira } from '../livros.ts';
+import { capsNaLixeira } from '../capitulos.ts';
 import { Importar } from '../Importar.tsx';
 import { ir, useApp } from '../store.tsx';
 import { Topo } from '../Topo.tsx';
@@ -15,7 +16,7 @@ export function Ajustes() {
   const [politica, setPolitica] = useState(false);
   useEffect(() => { espacoUsado().then(setEspaco); }, [dados]);
   const set = (p: Partial<A>) => mudar((d) => ({ ...d, ajustes: { ...d.ajustes, ...p } }));
-  const lixo = naLixeira(dados.livros).length;
+  const lixo = naLixeira(dados.livros).length + capsNaLixeira(dados.capitulos).length;
   const breve = <span className="pill t-azul">Em breve</span>;
   return (
     <>

@@ -49,7 +49,7 @@ test('backup de um livro: leva os capítulos e entra sem apagar nada', () => {
   const caps = [novoCapitulo([], 'a', T0, 'c1', 'Abertura'), novoCapitulo([], 'b', T0, 'x1')];
   const ideias = [novaIdeia('ideia', 'a', [], T0, 'i1'), novaIdeia('outra', 'b', [], T0, 'i2')];
   const rascunhos = [novoRascunho('a', T0, 'r1', { capituloId: 'c1' })];
-  const r = importar(exportarLivro(l, { capitulos: caps, ideias, rascunhos }, T0), T0);
+  const r = importar(exportarLivro(l, { capitulos: caps, cenas: [], ideias, rascunhos }, T0), T0);
   assert.equal(r.tipo, 'livro');
   if (r.tipo !== 'livro') return;
   assert.deepEqual(r.capitulos.map((c) => c.id), ['c1']);
@@ -73,10 +73,12 @@ test('nome do arquivo de backup', () => {
 });
 
 test('rotas: ida e volta e nível de cima', () => {
-  for (const h of ['#/', '#/novo', '#/livro/abc', '#/livro/abc/capitulos', '#/livro/abc/cap/c1', '#/livro/abc/rascunho/r1', '#/livro/abc/ia', '#/livro/abc/ia/cap.c1', '#/lixeira', '#/ajustes', '#/ideias', '#/comunidade']) assert.equal(hashDe(lerRota(h)), h);
+  for (const h of ['#/', '#/novo', '#/livro/abc', '#/livro/abc/capitulos', '#/livro/abc/cap/c1', '#/livro/abc/rascunho/r1', '#/livro/abc/ia', '#/livro/abc/ia/cap.c1', '#/livro/abc/capitulo/c1', '#/livro/abc/capitulo/c1/cena/s1', '#/lixeira', '#/ajustes', '#/ideias', '#/comunidade']) assert.equal(hashDe(lerRota(h)), h);
   assert.deepEqual(lerRota(''), { tela: 'biblioteca' });
   assert.deepEqual(lerRota('#/qualquer'), { tela: 'biblioteca' });
   assert.deepEqual(acima(lerRota('#/livro/abc/guia')), { tela: 'livro', id: 'abc' });
+  assert.deepEqual(acima(lerRota('#/livro/abc/cap/c1')), { tela: 'area', id: 'abc', area: 'capitulos' });
+  assert.deepEqual(acima(lerRota('#/livro/abc/capitulo/c1/cena/s1')), { tela: 'capitulo', id: 'abc', cap: 'c1' });
   assert.deepEqual(acima(lerRota('#/livro/abc')), { tela: 'biblioteca' });
   assert.equal(acima(lerRota('#/')), null);
 });

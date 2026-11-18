@@ -5,6 +5,7 @@ import { novoId, quando } from '../livros.ts';
 import { ir, useApp } from '../store.tsx';
 import { Topo } from '../Topo.tsx';
 import { Icon } from '../ui.tsx';
+import { AbasLivro } from './AbasLivro.tsx';
 
 export function criarRascunho(mudar: ReturnType<typeof useApp>['mudar'], livroId: string, e: Parameters<typeof novoRascunho>[3] = {}): string {
   const id = novoId();
@@ -26,6 +27,7 @@ export function Rascunhos({ livroId }: { livroId: string }) {
     <>
       <Topo cima={livro?.titulo ?? 'Livro'} tela="Rascunhos" />
       <main className="scroll">
+        <AbasLivro livroId={livroId} atual="rascunhos" />
         <div className="sub" style={{ marginTop: 0 }}>Escreva sem decidir onde vai entrar. Um rascunho pode ficar sem capítulo para sempre.</div>
         {doLivro.length > 0 && (
           <div className="row" style={{ marginBottom: 12 }}>
