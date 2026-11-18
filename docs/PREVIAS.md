@@ -2,7 +2,7 @@
 
 | Data | Prévia | Link | Arquivo | Situação |
 |---|---|---|---|---|
-| 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 e v2 vistas; **v3** (mesmo link) aguardando opinião |
+| 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 a v3 vistas; **v4** (mesmo link) aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -15,3 +15,4 @@
   bloco manuscrito, referências sublinhadas e menu do `/`.
 - v2: ideias com tags ("Cocriação IA" em destaque) e filtro por tag; tela Copiar para IA com pedido pronto e texto para colar; telas "Em breve".
 - v3: dois ambientes. Botão Comunidade na Biblioteca troca a barra (Início · Descobrir · Feed · Salvos · Perfil) e a cor; feed de prévias (imagem + trecho, curtir, salvar, ler); nova prévia; leitura com virada de página; barra de baixo se recolhe ao rolar.
+- v4: 5º botão da Criação = Ajustes (personalização com recolher a barra, tema, sincronização Google, integrações, armazenamento e backup, privacidade: política, termos, diretrizes, baixar dados, excluir conta).

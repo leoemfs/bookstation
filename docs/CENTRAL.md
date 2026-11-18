@@ -19,6 +19,7 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | F9 | Linha do tempo, mapa de relações, continuidade, quadro | G | anotado |
 | F10 | Sincronização com a conta Google (Drive da pessoa, igual ao CP Hub) | M | anotado (`futuro/SINCRONIZACAO-GOOGLE.md`) |
 | F11 | IA: chave da própria pessoa (depois do copiar e colar da F6) | M | anotado (`futuro/IA.md`) |
+| F12a | Diretrizes da comunidade e LGPD prontas e revisadas por advogado (antes da F12) | P | rascunho (`futuro/DIRETRIZES-COMUNIDADE.md`, `futuro/LGPD.md`) |
 | F12 | Comunidade: publicar e ler livros de outros autores (precisa de servidor) | G | anotado (`futuro/COMUNIDADE.md`) |
 | F13 | IA embutida com servidor e limite de uso (precisa de cobrança) | G | anotado (`futuro/IA.md`) |
 
@@ -27,7 +28,6 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 
 ## Caixa de entrada
 - Gmail só para os apps (dono dos projetos Google Cloud, conta da IA e servidor). Um projeto Google por app.
-- Decidir o 5º botão da barra da Biblioteca (hoje "A definir").
 - Personalização das barras: barra de baixo que se recolhe ao rolar (opção liga/desliga). A de cima fica fixa.
 
 ## Decisões (18/11/2026)
@@ -35,6 +35,7 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 - Comunidade (Publicar) e IA dentro do app aparecem como **"Em breve"**.
 - No editor, o botão de IA virou **Copiar p/ IA** (funciona sem servidor).
 - Branch `main` criado.
+- 5º botão da Criação: **Ajustes** (personalização, tema, sincronização, integrações, armazenamento, privacidade). Prévia v4.
 - Comunidade é um **segundo ambiente**: barra própria (Início · Descobrir · Feed · Salvos · Perfil), cor violeta, feed de prévias com curtir e salvar (prévia v3).
 
 ## Feito
