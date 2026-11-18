@@ -1,0 +1,350 @@
+<title>BookStation Livro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@7..72,500;7..72,600&family=Caveat:wght@500&display=swap">
+<style>
+/* Layout: moldura de celular centralizada; barra fixa no topo, cartões no meio, barra de 5 ações com + no centro */
+:root{
+  color-scheme:dark;
+  --bg:#08080a; --surface:#121214; --raised:#1c1c1f; --border:#2a2a2f;
+  --text:#f4f2ee; --muted:#a3a0a8; --faint:#6e6b73;
+  --accent:#e0a84a; --accent-soft:rgb(224 168 74 / .14); --on-accent:#1a1204;
+  --green:#4ade80; --blue:#60a5fa; --violet:#c4a5fd; --red:#f87171;
+  --paper-white:#fbfaf7; --paper-old:#efe3c4; --ink:#22201c;
+  --f-ui:"Inter",system-ui,sans-serif; --f-book:"Literata",Georgia,serif; --f-hand:"Caveat","Segoe Print",cursive;
+}
+body{background:#000;color:var(--text);font-family:var(--f-ui);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.note{max-width:420px;color:var(--muted);font-size:13px;line-height:1.5;text-align:center}
+.note b{color:var(--text)}
+.phone{width:100%;max-width:400px;height:780px;max-height:calc(100vh - 110px);min-height:560px;background:var(--bg);border:1px solid var(--border);border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.top{position:absolute;inset:0 0 auto;z-index:5;display:flex;align-items:center;gap:6px;padding:14px 12px 12px;background:rgb(8 8 10 / .92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.top .t{flex:1;min-width:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .t span{color:var(--muted)} .top .t b{font-weight:600}
+.ib{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:none;border:0;color:var(--text);cursor:pointer}
+.ib:hover{background:var(--raised)} .ib.back{color:var(--accent)} .ib[hidden]{display:none}
+svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.scroll{flex:1;overflow-y:auto;padding:76px 14px 110px}
+.h{font-family:var(--f-book);font-size:24px;font-weight:600;margin:4px 2px 12px;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:-6px 2px 14px}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:20px 2px 10px}
+.row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:none;padding:7px 12px;border-radius:999px;background:var(--raised);color:var(--muted);font-size:13px;border:1px solid transparent;cursor:pointer}
+.chip.on{background:var(--accent-soft);color:var(--accent);border-color:rgb(224 168 74 / .35)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:#3a3a40}
+.stack{display:flex;flex-direction:column;gap:10px}
+.book{display:flex;gap:14px}
+.cover{flex:none;width:70px;height:100px;border-radius:6px 10px 10px 6px;display:flex;align-items:flex-end;padding:8px;font-family:var(--f-book);font-size:11px;line-height:1.15;color:#fff;box-shadow:inset 6px 0 0 rgb(0 0 0 / .25)}
+.book .info{min-width:0;display:flex;flex-direction:column;gap:4px}
+.book h3{margin:0;font-family:var(--f-book);font-size:17px;font-weight:600}
+.meta{color:var(--muted);font-size:12.5px;line-height:1.45}
+.pill{align-self:flex-start;font-size:11.5px;padding:3px 9px;border-radius:999px;font-weight:500}
+.p-esc{background:rgb(74 222 128 / .13);color:var(--green)} .p-plan{background:rgb(96 165 250 / .14);color:var(--blue)} .p-rev{background:rgb(196 165 253 / .15);color:var(--violet)} .p-dev{background:var(--accent-soft);color:var(--accent)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;gap:8px;min-height:86px}
+.tile .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.tile .ic svg{width:19px;height:19px}
+.tile b{font-size:14px;font-weight:600} .tile small{color:var(--muted);font-size:12px}
+.hero{background:linear-gradient(160deg,#2a1f0e,#141216 70%);border-color:#3b2e17}
+.hero .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.hero h3{font-family:var(--f-book);margin:6px 0 4px;font-size:19px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums} .stat small{font-size:11px;color:var(--muted)}
+.chap{display:flex;gap:12px;align-items:center}
+.num{flex:none;width:34px;height:34px;border-radius:10px;background:var(--raised);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted)}
+.chap .info{flex:1;min-width:0} .chap h4{margin:0 0 2px;font-size:15px;font-weight:600}
+.drag{color:var(--faint)}
+.person{display:flex;gap:12px;align-items:center}
+.av{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-family:var(--f-book);font-size:20px;color:#fff}
+.person h4{margin:0;font-size:15px} .refs{font-size:12px;color:var(--accent);margin-top:3px}
+/* barra de baixo */
+.bar{position:absolute;inset:auto 10px 12px;z-index:8;height:64px;border-radius:22px;background:rgb(28 28 31 / .95);backdrop-filter:blur(10px);border:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
+.bar button{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-family:var(--f-ui);cursor:pointer;padding:6px 0}
+.bar button.on{color:var(--accent)}
+.bar .plus{justify-self:center;width:54px;height:54px;border-radius:18px;background:var(--accent);color:var(--on-accent);margin-top:-22px;box-shadow:0 6px 18px rgb(224 168 74 / .35);display:grid;place-items:center;padding:0}
+.bar .plus svg{width:26px;height:26px;stroke-width:2.4;transition:transform .2s}
+.bar .plus.open svg{transform:rotate(45deg)}
+/* folha do + */
+.shade{position:absolute;inset:0;z-index:6;background:rgb(0 0 0 / .55)}
+.sheet{position:absolute;inset:auto 0 0;z-index:7;background:var(--raised);border-radius:24px 24px 0 0;padding:10px 14px 96px;border-top:1px solid var(--border)}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 12px}
+.sheet h5{margin:0 4px 10px;font-size:13px;color:var(--muted);font-weight:500}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.act{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text);font-size:12px;font-family:var(--f-ui);cursor:pointer;text-align:center}
+.act .ic{color:var(--accent)}
+.sep{grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0}
+/* editor */
+.tools{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;z-index:2}
+.trow{display:flex;align-items:center;gap:4px}
+.sel{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:13.5px;color:var(--text);display:flex;justify-content:space-between}
+.tb{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:none;border:0;color:var(--text);font-weight:700;font-size:16px;cursor:pointer;font-family:var(--f-ui)}
+.tb.hl{background:#6b5517;color:#fff} .tb.more{width:auto;padding:0 8px;color:var(--muted);font-weight:500;font-size:13px;margin-left:auto}
+.paper{margin-top:10px;border-radius:14px;padding:22px 20px;font-family:var(--f-book);font-size:16.5px;line-height:1.7;transition:background .2s,color .2s}
+.paper.white{background:var(--paper-white);color:var(--ink)} .paper.old{background:var(--paper-old);color:#3a2f1c} .paper.black{background:#0e0e10;color:#e8e4dc;border:1px solid var(--border)}
+.paper h2{font-size:20px;margin:0 0 10px}
+.paper p{margin:0 0 12px}
+.ref{border-bottom:2px solid var(--accent);font-weight:600;cursor:pointer}
+.hand{font-family:var(--f-hand);font-size:22px;line-height:1.3;padding:10px 14px;border-left:3px solid currentColor;opacity:.9}
+.slash{background:var(--raised);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:6px;font-family:var(--f-ui);font-size:13px;margin:-4px 0 12px;box-shadow:0 10px 24px rgb(0 0 0 / .4)}
+.slash div{padding:8px 10px;border-radius:9px;display:flex;justify-content:space-between}
+.slash div:first-child{background:var(--accent-soft)} .slash small{color:var(--muted)}
+.foot{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px;padding:0 4px}
+.dot{color:var(--green)}
+.seg{display:flex;gap:6px;margin-top:10px}
+.seg button{flex:1;border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:10px;padding:7px 4px;font-size:12px;cursor:pointer;font-family:var(--f-ui)}
+.seg button.on{color:var(--accent);border-color:rgb(224 168 74 / .45)}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);z-index:9;background:var(--text);color:var(--bg);padding:9px 14px;border-radius:12px;font-size:13px;white-space:nowrap}
+.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.tag{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--raised);color:var(--muted)}
+.tag.ai{background:rgb(196 165 253 / .15);color:var(--violet)}
+.export{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;font-size:12px;line-height:1.5;color:var(--muted);white-space:pre-wrap;max-height:210px;overflow:auto;margin:14px 0 0;font-family:ui-monospace,Menlo,monospace}
+.btn{border:0;border-radius:14px;padding:13px;font:600 14px var(--f-ui);background:var(--accent);color:var(--on-accent);cursor:pointer}
+.btn.ghost{background:var(--raised);color:var(--text)}
+.soon{display:flex;flex-direction:column;gap:4px;border-style:dashed;cursor:default}
+.phone.com{--accent:#b79cff;--accent-soft:rgb(183 156 255 / .14);--on-accent:#140d26}
+.bar{transition:transform .25s ease}
+.bar.hide{transform:translateY(130%)}
+.bar .plus.here{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+.post{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.ph{display:flex;gap:10px;align-items:center;padding:12px}
+.ph b{font-size:14px}
+.av.sm{width:36px;height:36px;border-radius:12px;font-size:16px}
+.art{aspect-ratio:4/5;max-width:100%;display:flex;align-items:flex-end;padding:22px;position:relative}
+.art::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,rgb(255 255 255 / .12),transparent 55%)}
+.quote{position:relative;z-index:1;font-family:var(--f-book);font-size:21px;line-height:1.4;color:#fff;text-wrap:balance;text-shadow:0 2px 12px rgb(0 0 0 / .4);outline:none}
+.pa{display:flex;align-items:center;gap:4px;padding:8px 10px}
+.lk{display:flex;align-items:center;gap:5px;background:none;border:0;color:var(--muted);padding:8px;border-radius:10px;font:500 13px var(--f-ui);cursor:pointer}
+.lk.on{color:var(--accent)} .lk.on svg{fill:currentColor}
+.rd{margin-left:auto;background:var(--accent-soft);color:var(--accent);border:0;border-radius:12px;padding:9px 14px;font:600 13px var(--f-ui);cursor:pointer}
+.shelf{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.cv{display:flex;flex-direction:column;gap:4px;cursor:pointer;min-width:0}
+.cv b{font-size:13.5px} .cv small{color:var(--muted);font-size:12px}
+.flipbox{perspective:1400px}
+.page{min-height:400px;transform-origin:left center}
+.turn-f{animation:tf .46s ease} .turn-b{animation:tb .46s ease}
+@keyframes tf{0%{transform:rotateY(0)}50%{transform:rotateY(-80deg);filter:brightness(.7)}100%{transform:rotateY(0)}}
+@keyframes tb{0%{transform:rotateY(0)}50%{transform:rotateY(80deg);filter:brightness(.7)}100%{transform:rotateY(0)}}
+.set{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;font-size:14px;border-top:1px solid var(--border)}
+.srow:first-child{border-top:0}
+.sv{color:var(--muted);font-size:13px;flex:none}
+.tgl{display:inline-block;width:42px;height:24px;border-radius:999px;background:var(--border);position:relative;cursor:pointer;vertical-align:middle}
+.tgl::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text);transition:transform .2s}
+.tgl.on{background:var(--accent)} .tgl.on::after{transform:translateX(18px);background:var(--on-accent)}
+.mini{display:flex;gap:4px} .mini b{font-weight:500;padding:4px 8px;border-radius:8px;background:var(--raised);font-size:12px} .mini b.on{color:var(--accent);background:var(--accent-soft)}
+button:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.top .t{display:flex;min-width:0}.top .t span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;padding-right:4px}.top .t b{flex:none;max-width:70%;overflow:hidden;text-overflow:ellipsis}
+.jump{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.jump button{border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:999px;padding:7px 12px;font:500 13px var(--f-ui);cursor:pointer}
+.jump button.on{color:var(--accent);border-color:rgb(224 168 74 / .45)}
+.steps{display:flex;gap:6px;margin:2px 2px 16px}
+.steps i{flex:1;height:4px;border-radius:4px;background:var(--border)} .steps i.on{background:var(--accent)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12.5px;color:var(--muted)}
+.inp{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--text);font:15px var(--f-ui);min-height:20px;outline:none}
+.inp:focus{border-color:var(--accent)}
+.inp.big{font:600 20px var(--f-book)}
+.inp.area{min-height:64px;line-height:1.5}
+.inp:empty::before{content:attr(data-ph);color:var(--faint)}
+.covers{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.covers .cover{width:62px;height:90px;cursor:pointer;border:2px solid transparent;font-size:10px}
+.covers .cover.on{border-color:var(--accent)}
+.covers .up{display:grid;place-items:center;background:var(--surface);border:1px dashed var(--border);color:var(--muted);box-shadow:none;font-family:var(--f-ui);text-align:center}
+.opt{display:flex;gap:12px;align-items:flex-start}
+.opt .rad{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);margin-top:2px}
+.opt.on{border-color:rgb(224 168 74 / .5)} .opt.on .rad{border:6px solid var(--accent)}
+.opt b{font-size:14.5px} .beats{font-size:12px;color:var(--faint);margin-top:4px;line-height:1.5}
+.bk{display:flex;gap:14px;align-items:flex-start}
+.bk .cover{width:84px;height:122px;font-size:12px}
+.bk h2{margin:2px 0 6px;font:600 22px/1.2 var(--f-book);text-wrap:balance}
+.dots3{margin-left:auto;align-self:flex-start}
+.bars{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--raised);margin:10px 0 8px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.hint{display:flex;gap:10px;align-items:center}
+.hint .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:none}
+.hint .ic svg{width:17px;height:17px}
+.hint span{flex:1;font-size:13.5px} .hint em{font-style:normal;color:var(--accent);font-size:13px}
+.recent{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:10px 2px;border-top:1px solid var(--border)}
+.recent:first-child{border-top:0} .recent small{color:var(--faint);flex:none}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:12px}
+.tabs button{flex:1;border:0;background:none;color:var(--muted);border-radius:10px;padding:8px 4px;font:500 13px var(--f-ui);cursor:pointer}
+.tabs button.on{background:var(--raised);color:var(--text)}
+.gf{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.gf .k{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.gf .k button{background:none;border:0;color:var(--accent);font:500 12px var(--f-ui);cursor:pointer;padding:2px}
+.gf .v{font-size:14.5px;line-height:1.5;outline:none;min-height:21px}
+.gf .v:empty::before{content:attr(data-ph);color:var(--faint)}
+.gf.filled .k::after{content:"✓";color:var(--green);margin-left:auto;padding-left:8px}
+.gf.filled .k{gap:0}
+.beatlist{display:flex;flex-direction:column;gap:0}
+.beat{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border);font-size:13.5px}
+.beat:first-child{border-top:0}
+.beat .n{width:22px;height:22px;border-radius:7px;background:var(--raised);display:grid;place-items:center;font-size:11px;color:var(--muted);flex:none}
+.beat small{margin-left:auto;color:var(--faint);font-size:12px}
+.qs{display:flex;flex-direction:column;gap:8px}
+.qs div{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:13.5px;cursor:pointer}
+.menu{display:flex;flex-direction:column}
+.menu button{display:flex;gap:12px;align-items:center;background:none;border:0;color:var(--text);font:14.5px var(--f-ui);padding:13px 6px;border-top:1px solid var(--border);cursor:pointer;text-align:left}
+.menu button:first-child{border-top:0} .menu button .ic{color:var(--muted)} .menu .danger{color:var(--red)} .menu .danger .ic{color:var(--red)}
+.confirm{text-align:center;padding:4px 6px 0} .confirm h4{margin:4px 0 6px;font-size:17px} .confirm p{color:var(--muted);font-size:13.5px;line-height:1.5;margin:0 0 14px}
+.btn.danger{background:var(--red);color:#1b0606}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+
+<div class="wrap">
+  <p class="note"><b>Prévia P2: o livro (exemplo).</b> Criar livro em 2 passos, painel do livro e guia do livro. Toque no ⋯ do painel para editar, arquivar ou excluir.</p>
+  <div class="jump" id="jump"><button data-j="criar1">Criar livro</button><button data-j="painel">Painel</button><button data-j="guia">Guia do livro</button></div>
+  <div class="phone" id="phone">
+    <header class="top">
+      <button class="ib back" id="back" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="t" id="title"></div>
+      <button class="ib" aria-label="Pesquisar"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg></button>
+    </header>
+    <main class="scroll" id="main"></main>
+    <nav class="bar" id="bar"></nav>
+  </div>
+</div>
+
+<script>
+const I={
+ lib:'<path d="M4 5h4v14H4zM10 5h4v14h-4zM16.5 5.5l3.5-1 3 13.5-3.5 1z" transform="translate(-1 0)"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+ trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
+ pin:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+ pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
+ draft:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+ img:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>',
+ cloud:'<path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ scene:'<path d="M4 6h16v12H4zM4 10h16M9 6v4M15 6v4"/>',
+ link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+ ai:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
+ read:'<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',
+ hand:'<path d="M4 18c3 0 4-8 7-8s1 6 4 6 3-4 5-4"/>',
+ line:'<path d="M4 12h16"/>',
+ upload:'<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+ send:'<path d="M4 12l16-8-6 16-2.5-6.5z"/><path d="M11.5 13.5L20 4"/>',
+ dots:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+ feed:'<rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/>',
+ heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ bookmark:'<path d="M6 4h12v17l-6-4-6 4z"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+ star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
+};
+
+const ic=(n)=>`<svg viewBox="0 0 24 24">${I[n]||I.dots}</svg>`;
+const $=(id)=>document.getElementById(id);
+const BOOK={t:'A Estação das Marés',g:'Fantasia · Mistério',c:'#1d4e5f,#0e2a33'};
+let cur='painel', sheet=null, gtab='id', model='3a', coverSel=0;
+const COVERS=['#1d4e5f,#0e2a33','#6b2e2e,#331414','#3c3a6b,#1b1a36','#2f5a2a,#142812','#6b5517,#2b2208'];
+const BAR_BOOK=[['home','Painel','painel'],['list','Capítulos',''],null,['user','Fichas',''],['bulb','Ideias','']];
+const BAR_LIB=[['lib','Biblioteca',''],['bulb','Ideias',''],null,['globe','Comunidade',''],['gear','Ajustes','']];
+
+const GUIA={
+ id:[['Título','A Estação das Marés',''],['Subtítulo','','Opcional. Ex.: “Um mistério à beira-mar”'],['Gênero e subgênero','Fantasia · mistério','' ],['Público','Jovem adulto',''],['Premissa','Uma cidade onde o mar recua um pouco a cada noite, e uma faroleira que sabe por quê.',''],['Sinopse','','Em 3 a 5 frases: quem, o que quer, o que impede, o que está em jogo.']],
+ dir:[['Narrador e ponto de vista','3ª pessoa, próxima da Iracema',''],['Tempo verbal','Passado',''],['Tom','Melancólico, com momentos de humor seco',''],['Estilo','','Ex.: frases curtas, poucas descrições, muito diálogo'],['Ritmo','','Ex.: lento no começo, acelera a partir do meio'],['Temas centrais','Memória, perda, o que a gente guarda','']],
+ plan:[['Conflito principal','Iracema quer proteger o segredo do farol; Tomé quer o porto livre do mar.',''],['Objetivo da história','',''],['Desfecho planejado','','Opcional. Pode ficar em branco até o fim.'],['Extensão estimada','','Ex.: 25 capítulos, 80 mil palavras']]
+};
+const SUG={'Sinopse':['Quem é a protagonista e o que ela quer?','O que impede que ela consiga?','O que ela perde se falhar?'],'Estilo':['Que autor tem um estilo parecido com o que você quer?','Prefere mostrar por diálogo ou por descrição?'],'Ritmo':['Onde a história deve acelerar?','Há capítulos de respiro entre momentos tensos?'],'Objetivo da história':['O que o leitor deve sentir no final?','Que pergunta a história responde?'],'Subtítulo':['Uma frase que diga o clima do livro.'],'Desfecho planejado':['Final fechado, aberto ou ambíguo?'],'Extensão estimada':['Quantos capítulos imagina?','Livro único ou série?']};
+
+const S={
+ criar1:{t:()=>'<span>Biblioteca / </span><b>Novo livro</b>',bar:BAR_LIB,back:'painel',h:()=>`
+  <div class="steps"><i class="on"></i><i></i></div>
+  <h1 class="h">O essencial</h1><div class="sub">Só o título é necessário. O resto dá para mudar depois.</div>
+  <div class="field"><label for="t">Título</label><div class="inp big" id="t" contenteditable="true" data-ph="Nome do livro">${BOOK.t}</div></div>
+  <div class="field"><label>Gênero</label><div class="row">${['Fantasia','Mistério','Romance','Ficção científica','Drama','Terror','Infantil','Não ficção'].map((g,i)=>`<span class="chip${i<2?' on':''}" data-chip>${g}</span>`).join('')}</div></div>
+  <div class="field"><label>Capa</label><div class="covers">${COVERS.map((c,i)=>`<div class="cover${i===coverSel?' on':''}" data-cov="${i}" style="background:linear-gradient(160deg,${c})">${BOOK.t}</div>`).join('')}<div class="cover up" data-act="Escolher imagem">${ic('img')}<br>Imagem</div></div></div>
+  <div class="field"><label>Situação</label><div class="row">${['Planejamento','Em desenvolvimento','Em escrita','Em revisão'].map((g,i)=>`<span class="chip${i===0?' on':''}" data-one>${g}</span>`).join('')}</div></div>
+  <button class="btn" data-go="criar2" style="width:100%;margin-top:6px">Continuar</button>`},
+ criar2:{t:()=>'<span>Novo livro / </span><b>Como começar</b>',bar:BAR_LIB,back:'criar1',h:()=>`
+  <div class="steps"><i class="on"></i><i class="on"></i></div>
+  <h1 class="h">Quer um roteiro?</h1><div class="sub">Opcional. Um modelo só cria os marcos da história no guia; nada é obrigatório.</div>
+  <div class="stack">
+   ${opt('livre','Livre','Sem estrutura. Você organiza do seu jeito.','')}
+   ${opt('3a','Três atos','Começo, meio e fim, com viradas entre eles.','Apresentação · Incidente inicial · Complicações · Ponto de virada · Clímax · Resolução')}
+   ${opt('jh','Jornada do herói','A personagem sai do mundo comum, é testada e volta transformada.','Mundo comum · Chamado · Recusa · Mentor · Travessia · Provas · Provação · Recompensa · Retorno')}
+   ${opt('7p','Sete pontos','Planejar do fim para o começo.','Gancho · Virada 1 · Pressão 1 · Ponto central · Pressão 2 · Virada 2 · Resolução')}
+  </div>
+  <div class="lbl">Já criar</div>
+  <div class="row"><span class="chip on" data-chip>Capítulo 1</span><span class="chip" data-chip>Caixa de ideias com 3 perguntas</span></div>
+  <div class="row2" style="margin-top:16px"><button class="btn ghost" data-go="criar1">Voltar</button><button class="btn" data-go="painel" data-toast="Livro criado">Criar livro</button></div>`},
+ painel:{t:()=>`<span>Biblioteca / </span><b>${BOOK.t}</b>`,bar:BAR_BOOK,back:'criar2',h:()=>`
+  <div class="bk"><div class="cover" style="background:linear-gradient(160deg,${COVERS[coverSel]})">${BOOK.t}</div><div style="min-width:0;flex:1"><h2>${BOOK.t}</h2><div class="meta">${BOOK.g}</div><div class="meta" style="color:var(--faint);margin:4px 0 8px">editado hoje, 09:14</div><span class="pill p-esc" data-sheet="sit" style="cursor:pointer">Em escrita ▾</span></div><button class="ib dots3" data-sheet="menu" aria-label="Mais opções">${ic('dots')}</button></div>
+  <div class="card hero" style="margin-top:14px" data-act="Abrir editor no cap. 7"><div class="k">Continuar escrevendo</div><h3>Cap. 7 · A maré que não voltou</h3><div class="meta">Parou em “…e o farol ficou aceso a noite inteira.”</div></div>
+  <div class="lbl">Andamento</div>
+  <div class="card" style="cursor:default"><div style="display:flex;justify-content:space-between;font-size:14px"><b>12 capítulos</b><span class="meta">18.430 palavras</span></div>
+   <div class="bars"><i style="width:33%;background:var(--green)"></i><i style="width:17%;background:var(--violet)"></i><i style="width:8%;background:var(--accent)"></i><i style="width:42%;background:var(--blue);opacity:.45"></i></div>
+   <div class="legend"><span><i style="background:var(--green)"></i>4 concluídos</span><span><i style="background:var(--violet)"></i>2 em revisão</span><span><i style="background:var(--accent)"></i>1 em escrita</span><span><i style="background:var(--blue);opacity:.45"></i>5 planejados</span></div></div>
+  <div class="lbl">Para organizar quando quiser</div>
+  <div class="card stack" style="cursor:default;gap:12px">
+   <div class="hint"><span class="ic">${ic('draft')}</span><span>4 rascunhos sem capítulo</span><em>Ver</em></div>
+   <div class="hint"><span class="ic">${ic('bulb')}</span><span>7 ideias na caixa de entrada</span><em>Ver</em></div>
+   <div class="hint" data-go="guia" style="cursor:pointer"><span class="ic">${ic('compass')}</span><span>Guia do livro: 11 de 16 campos</span><em>Abrir</em></div></div>
+  <div class="lbl">Áreas do livro</div>
+  <div class="grid">${tile('list','Capítulos','12 · 31 cenas')}${tile('draft','Rascunhos','9')}${tile('user','Personagens','14')}${tile('pin','Locais','8')}${tile('cloud','Climas','5')}${tile('img','Imagens','23')}${tile('compass','Guia do livro','identidade e tom','guia')}${tile('star','Bíblia do universo','regras do mundo')}</div>
+  <div class="lbl">Últimas alterações</div>
+  <div class="card" style="cursor:default;padding:4px 14px">
+   <div class="recent"><span>Cap. 7 · A maré que não voltou</span><small>hoje</small></div>
+   <div class="recent"><span>Ficha: Lia (nova característica)</span><small>ontem</small></div>
+   <div class="recent"><span>Rascunho: Discussão na estação</span><small>15/11</small></div></div>`},
+ guia:{t:()=>`<span>${BOOK.t} / </span><b>Guia do livro</b>`,bar:BAR_BOOK,back:'painel',h:()=>`
+  <div class="sub" style="margin-top:0">A referência do livro. Tudo opcional; usado também no “Copiar para IA”.</div>
+  <div class="tabs">${[['id','Identidade'],['dir','Direção'],['plan','Planejamento']].map(([k,l])=>`<button class="${gtab===k?'on':''}" data-gtab="${k}">${l}</button>`).join('')}</div>
+  ${GUIA[gtab].map(([k,v,ph])=>`<div class="gf${v?' filled':''}"><div class="k"><span>${k}</span>${!v&&SUG[k]?`<button data-sug="${k}">Ajuda</button>`:''}</div><div class="v" contenteditable="true" data-ph="${ph||'Toque para escrever'}">${v}</div></div>`).join('')}
+  ${gtab==='plan'?`<div class="lbl">Estrutura: Três atos</div><div class="card beatlist" style="cursor:default;padding:4px 14px">${[['Apresentação','Cap. 1–2'],['Incidente inicial','Cap. 3'],['Complicações','Cap. 4–7'],['Ponto de virada','—'],['Clímax','—'],['Resolução','—']].map((b,i)=>`<div class="beat"><span class="n">${i+1}</span>${b[0]}<small>${b[1]}</small></div>`).join('')}</div><div class="meta" style="margin:8px 2px">Trocar de modelo ou criar o seu, a qualquer momento.</div>`:''}`},
+};
+function opt(k,t,d,b){return `<div class="card opt${model===k?' on':''}" data-model="${k}"><span class="rad"></span><div><b>${t}</b><div class="meta">${d}</div>${b?`<div class="beats">${b}</div>`:''}</div></div>`}
+function tile(i,t,s,go){return `<div class="card tile" tabindex="0" ${go?`data-go="${go}"`:'data-act="Abrir '+t+'"'}><div class="ic">${ic(i)}</div><b>${t}</b><small>${s}</small></div>`}
+
+const SHEETS={
+ menu:()=>`<h5>${BOOK.t}</h5><div class="menu">
+  <button data-act="Editar título, gênero e capa"><span class="ic">${ic('pen')}</span>Editar título, gênero e capa</button>
+  <button data-act="Livro duplicado"><span class="ic">${ic('draft')}</span>Duplicar livro</button>
+  <button data-act="Exportar (arquivo ou texto)"><span class="ic">${ic('upload')}</span>Exportar</button>
+  <button data-act="Livro arquivado"><span class="ic">${ic('lib')}</span>Arquivar</button>
+  <button class="danger" data-sheet="del"><span class="ic">${ic('trash')}</span>Excluir</button></div>`,
+ del:()=>`<div class="confirm"><h4>Mover para a lixeira?</h4><p>“${BOOK.t}” e tudo dentro dele (capítulos, fichas, imagens) ficam na lixeira por 30 dias. Dá para recuperar.</p><div class="row2"><button class="btn ghost" data-close>Cancelar</button><button class="btn danger" data-act="Movido para a lixeira">Excluir</button></div></div>`,
+ sit:()=>`<h5>Situação da obra</h5><div class="menu">${['Planejamento','Em desenvolvimento','Em escrita','Em revisão','Concluído','Arquivado'].map(x=>`<button data-act="Situação: ${x}">${x}</button>`).join('')}</div>`,
+};
+
+function render(){
+  const s=S[cur];
+  $('title').innerHTML=s.t(); $('main').innerHTML=s.h();
+  $('bar').innerHTML=s.bar.map(b=>b?`<button class="${b[2]===cur||(b[2]==='painel'&&cur==='guia')?'on':''}" ${b[2]?`data-go="${b[2]}"`:`data-act="Abrir ${b[1]}"`}>${ic(b[0])}${b[1]}</button>`:`<button class="plus" data-act="Menu + do livro">${ic('plus')}</button>`).join('');
+  document.querySelectorAll('.sheet,.shade').forEach(e=>e.remove());
+  if(sheet){$('phone').insertAdjacentHTML('beforeend',`<div class="shade" data-close></div><div class="sheet" style="padding-bottom:24px;z-index:9"><div class="grab"></div>${SHEETS[sheet]?SHEETS[sheet]():sheet}</div>`)}
+  document.querySelectorAll('#jump button').forEach(b=>b.classList.toggle('on',b.dataset.j===cur||(b.dataset.j==='criar1'&&cur==='criar2')));
+}
+function go(k,keep){cur=k;sheet=null;render();if(!keep)$('main').scrollTop=0}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;$('phone').appendChild(e);setTimeout(()=>e.remove(),1600)}
+$('back').onclick=()=>go(S[cur].back);
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-j],[data-go],[data-act],[data-sheet],[data-close],[data-gtab],[data-sug],[data-model],[data-cov],[data-chip],[data-one]');
+  if(!t)return;
+  const d=t.dataset;
+  if(d.j)return go(d.j);
+  if(d.toast)toast(d.toast);
+  if(d.go)return go(d.go);
+  if(d.sheet){sheet=d.sheet;return render()}
+  if(d.close!==undefined){sheet=null;return render()}
+  if(d.act){const wasSheet=!!sheet;sheet=null;if(wasSheet)render();return toast(d.act)}
+  if(d.gtab){gtab=d.gtab;return go('guia',true)}
+  if(d.sug){sheet=`<h5>Perguntas para ajudar: ${d.sug}</h5><div class="qs">${SUG[d.sug].map(q=>`<div data-close>${q}</div>`).join('')}</div><div class="meta" style="margin-top:10px">Toque numa pergunta para usá-la como ponto de partida.</div>`;return render()}
+  if(d.model){model=d.model;return go('criar2',true)}
+  if(d.cov){coverSel=+d.cov;return go('criar1',true)}
+  if(d.chip!==undefined){t.classList.toggle('on');return}
+  if(d.one!==undefined){t.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));t.classList.add('on')}
+});
+render();
+</script>

@@ -1,0 +1,172 @@
+<title>BookStation Leitor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
+<style>
+/* Layout: moldura de celular; página paginada de verdade (colunas), controles aparecem ao tocar no meio */
+:root{color-scheme:dark;--bg:#000;--ui:#1c1c1f;--ui2:#121214;--border:#2a2a2f;--text:#f4f2ee;--muted:#a3a0a8;--accent:#e0a84a;--accent-soft:rgb(224 168 74 / .15);
+ --pg-white:#fbfaf7;--ink-white:#23211d;--pg-old:#f0e4c6;--ink-old:#3a2f1c;--pg-black:#111113;--ink-black:#e6e1d8;
+ --f-ui:"Inter",system-ui,sans-serif;--f-book:"Literata",Georgia,serif}
+body{background:var(--bg);color:var(--text);font-family:var(--f-ui);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+[hidden]{display:none!important}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.note{max-width:420px;color:var(--muted);font-size:13px;line-height:1.5;text-align:center;margin:0} .note b{color:var(--text)}
+.phone{width:100%;max-width:400px;height:780px;max-height:calc(100vh - 110px);min-height:560px;border:1px solid var(--border);border-radius:28px;overflow:hidden;position:relative;--pg:var(--pg-old);--ink:var(--ink-old);background:var(--pg);transition:background .25s}
+.phone.white{--pg:var(--pg-white);--ink:var(--ink-white)} .phone.black{--pg:var(--pg-black);--ink:var(--ink-black)}
+.vp{position:absolute;inset:44px 0 40px;overflow:hidden;perspective:1600px}
+.flow{height:100%;color:var(--ink);font-family:var(--f-book);font-size:var(--fs,17px);line-height:var(--lh,1.65);column-fill:auto;transition:transform .32s ease;hyphens:auto;text-align:justify}
+.flow.sans{font-family:var(--f-ui)}
+.flow.nojust{text-align:left}
+.flow p{margin:0;text-indent:1.4em} .flow p.first{text-indent:0} .flow p.first::first-letter{font-size:2.6em;float:left;line-height:.9;padding:4px 6px 0 0;font-weight:600}
+.flow h2{margin:18% 0 6px;font-size:1.35em;text-align:center;font-weight:600;text-wrap:balance}
+.flow .cn{break-before:column}.flow .cn:first-child{break-before:auto}
+.flow .cn{display:block;text-align:center;font:600 11px/1 var(--f-ui);letter-spacing:.18em;opacity:.55;margin-top:18%}
+.flow .cn+h2{margin-top:8px}
+.flow .orn{text-align:center;opacity:.5;margin:14px 0 18px;text-indent:0}
+.flow .hand{font-family:"Caveat",cursive;font-size:1.3em;text-indent:0;margin:10px 0;padding-left:12px;border-left:2px solid currentColor;opacity:.9}
+.hdr,.ftr{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;color:var(--ink);opacity:.5;font-size:11.5px;font-variant-numeric:tabular-nums}
+.hdr{top:0;height:44px;padding:0 20px;font-family:var(--f-book);font-style:italic} .ftr{bottom:0;height:40px}
+.turn{position:absolute;inset:44px 0 40px;overflow:hidden;background:var(--pg);transform-origin:left center;box-shadow:0 0 30px rgb(0 0 0 / .25);pointer-events:none;z-index:3}
+.turn::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgb(0 0 0 / .0) 60%,rgb(0 0 0 / .18));pointer-events:none}
+.chrome{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s}
+.chrome.on{opacity:1}
+.chrome.on .tb,.chrome.on .bb{pointer-events:auto}
+.tb{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:4px;padding:10px 8px;background:rgb(18 18 20 / .96);border-bottom:1px solid var(--border);color:var(--text)}
+.tb .t{flex:1;min-width:0;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .tb .t span{color:var(--muted)}
+.ib{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:none;border:0;color:var(--text);cursor:pointer;font:600 15px var(--f-book)}
+.ib.on{color:var(--accent)} .ib.back{color:var(--accent)}
+svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ib.on svg{fill:currentColor}
+.bb{position:absolute;bottom:0;left:0;right:0;padding:12px 16px 16px;background:rgb(18 18 20 / .96);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.bb .lineA{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)} .bb .lineA b{color:var(--text);font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.bb .row{display:flex;gap:8px}
+.bb button{flex:1;border:1px solid var(--border);background:var(--ui);color:var(--text);border-radius:12px;padding:9px;font:500 13px var(--f-ui);cursor:pointer}
+.shade{position:absolute;inset:0;z-index:8;background:rgb(0 0 0 / .45)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:var(--ui);color:var(--text);border-radius:22px 22px 0 0;padding:10px 16px 20px;border-top:1px solid var(--border);max-height:78%;overflow:auto}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 10px}
+.sheet h5{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:500}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6e6b73;margin:14px 0 8px}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;border:1px solid var(--border);background:var(--ui2);color:var(--muted);border-radius:10px;padding:9px 4px;font:500 13px var(--f-ui);cursor:pointer}
+.seg button.on{color:var(--accent);border-color:rgb(224 168 74 / .5);background:var(--accent-soft)}
+.sw{display:flex;gap:10px} .sw b{width:40px;height:40px;border-radius:12px;cursor:pointer;border:2px solid var(--border)} .sw b.on{border-color:var(--accent)}
+.toc button{width:100%;display:flex;justify-content:space-between;gap:10px;background:none;border:0;border-top:1px solid var(--border);color:var(--text);padding:12px 2px;font:14px var(--f-ui);cursor:pointer;text-align:left}
+.toc button:first-of-type{border-top:0} .toc button.on{color:var(--accent)} .toc small{color:var(--muted);flex:none} .toc button:disabled{color:#6e6b73;cursor:default}
+.toast{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);z-index:12;background:var(--text);color:#111;padding:9px 14px;border-radius:12px;font-size:13px;white-space:nowrap}
+.hint{position:absolute;inset:44px 0 40px;z-index:4;display:grid;grid-template-columns:1fr 2fr 1fr;pointer-events:none;opacity:0;transition:opacity .4s}
+.hint.on{opacity:1} .hint div{display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px;font:500 12px var(--f-ui);color:var(--ink);opacity:.75;border:1px dashed rgb(0 0 0 / .18);margin:6px;border-radius:12px}
+.phone.black .hint div{background:rgb(255 255 255 / .04);border-color:rgb(255 255 255 / .12)}
+@media (prefers-reduced-motion:reduce){.flow{transition:none}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap">
+
+<div class="wrap">
+  <p class="note"><b>Prévia P6: leitor do livro (exemplo).</b> Toque nas bordas ou deslize para virar a página. Toque no meio para ver os controles (Aa, índice, marcador).</p>
+  <div class="phone old" id="phone">
+    <div class="hdr" id="hdr">A Estação das Marés</div>
+    <div class="vp" id="vp"><div class="flow" id="flow">
+      <span class="cn">CAPÍTULO 6</span><h2 id="c6">Noite de neblina</h2>
+      <p class="first">A neblina chegou antes do jantar, como chegava sempre que alguém na vila tinha um segredo novo. Desceu o morro devagar, apagou primeiro a torre da capela, depois o telhado do armazém, e por fim engoliu o caminho de pedra que levava ao farol.</p>
+      <p>Iracema fechou as janelas uma por uma. Não por causa do frio, que ela nem sentia mais, mas porque a neblina tinha o hábito de entrar nas casas e ficar sentada nos cantos, ouvindo.</p>
+      <p>Lia estava à mesa com o caderno aberto. Escrevia depressa, com a língua no canto da boca, e cobria a página com o braço sempre que a avó passava.</p>
+      <p>— Não estou olhando — disse Iracema.</p>
+      <p>— Está, sim. Você olha com as costas.</p>
+      <p>Era verdade, e as duas sabiam. Iracema serviu o caldo, sentou-se na cadeira de palha e ficou escutando o mar. Naquela noite ele fazia um barulho diferente, mais baixo, como alguém que conta dinheiro no escuro.</p>
+      <p>Lá fora, um sino tocou três vezes. Não era hora de sino nenhum. Zé do Bote, se estivesse acordado, diria que era o vento batendo no metal. Padre Anselmo diria que era um aviso. Iracema não dizia nada, porque já tinha ouvido aquele sino uma vez, muito tempo atrás, na noite em que o mar levou o barco do pai dela e devolveu só o remo.</p>
+      <p class="orn">⁂</p>
+      <p class="first">Quando Lia dormiu, Iracema subiu a escada do farol com a lamparina na mão. Contou os degraus como fazia desde menina: noventa e sete. No último, parou para respirar e olhou para baixo, onde devia estar o mar.</p>
+      <p>Não havia mar. Havia só a neblina, e debaixo dela um silêncio que não era de água.</p>
+      <span class="cn">CAPÍTULO 7</span><h2 id="c7">A maré que não voltou</h2>
+      <p class="first">Naquela manhã o mar não voltou. Iracema contou as estacas do cais duas vezes, como quem conta os dedos depois de um susto. A areia molhada ia até onde a vista alcançava, cheia de conchas viradas, cordas esquecidas, um sapato pequeno que ninguém da vila reconheceria.</p>
+      <p>Do alto do farol, Lia acenava com o caderno na mão. Gritava alguma coisa que o vento cortava pela metade.</p>
+      <p class="hand">“Vó, o mar deixou um recado na areia.”</p>
+      <p>Iracema não respondeu. Sabia ler aquele tipo de recado desde menina, e sabia que nenhum deles trazia boa notícia. Desceu do cais e caminhou pela areia, os pés afundando a cada passo, até o ponto onde as marcas começavam.</p>
+      <p>Eram linhas. Longas, paralelas, como se alguém tivesse passado um ancinho enorme no fundo do mar durante a noite. E no fim das linhas, cravado na areia, estava o remo.</p>
+      <p>O mesmo remo. A mesma marca de faca no cabo, a mesma lasca que o pai tinha prometido consertar e nunca consertou.</p>
+      <p>Atrás dela, os primeiros moradores começavam a descer para a praia. Tomé Aragão vinha na frente, de chapéu, com o passo de quem já sabia o que ia encontrar.</p>
+      <p>— Bom dia, Dona Iracema — disse ele, olhando para o remo e não para ela. — Parece que o mar resolveu devolver as coisas.</p>
+      <p>— O mar não devolve — respondeu Iracema. — O mar guarda. Quem devolve é gente.</p>
+      <p>Tomé sorriu. Era um sorriso curto, de comerciante, que não chegava aos olhos.</p>
+      <p>— Então a senhora há de concordar comigo que está na hora de alguém cuidar do que ficou na areia.</p>
+      <p>Iracema pegou o remo. Era mais leve do que ela lembrava, ou ela era mais forte do que pensava. Virou-se para o farol, onde Lia ainda acenava, e começou a voltar.</p>
+      <span id="end"></span>
+    </div></div>
+    <div class="ftr" id="ftr"></div>
+    <div class="hint on" id="hint"><div>‹ voltar</div><div>controles</div><div>avançar ›</div></div>
+    <div class="chrome" id="chrome">
+      <div class="tb"><button class="ib back" data-toast="Voltaria para o painel do livro" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="t" id="tt"></div>
+        <button class="ib" data-sheet="toc" aria-label="Índice"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button>
+        <button class="ib" id="mark" aria-label="Marcador"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg></button>
+        <button class="ib" data-sheet="aa" aria-label="Aparência">Aa</button></div>
+      <div class="bb"><div class="lineA"><span id="pl"></span><b id="bp"></b></div><input type="range" id="rg" min="0" value="0" aria-label="Página"><div class="row"><button data-toast="Abriria o editor neste ponto do texto">Editar este trecho</button><button data-toast="Abriria Copiar para IA com este capítulo">Copiar p/ IA</button></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=(id)=>document.getElementById(id);
+const phone=$('phone'),vp=$('vp'),flow=$('flow');
+let page=0,total=1,W=0,m=26,fs=17,lh=1.65,anim='folhear',chromeOn=false,marks=new Set(),font='serif',just=true;
+function layout(keepFrac){const frac=total>1?page/(total-1):0;W=vp.clientWidth;flow.style.padding=`0 ${m}px`;flow.style.columnWidth=(W-2*m)+'px';flow.style.columnGap=(2*m)+'px';flow.style.setProperty('--fs',fs+'px');flow.style.setProperty('--lh',lh);flow.classList.toggle('sans',font==='sans');flow.classList.toggle('nojust',!just);
+  const e=$('end');total=Math.max(1,Math.floor((e.offsetLeft-1)/W)+1);if(keepFrac)page=Math.round(frac*(total-1));page=Math.min(page,total-1);$('rg').max=total-1;show(false)}
+function chapAt(p){const c7=$('c7');const p7=Math.floor(c7.offsetLeft/W);return p>=p7?{n:7,t:'A maré que não voltou',start:p7,end:total-1}:{n:6,t:'Noite de neblina',start:0,end:p7-1}}
+function show(animate=true){flow.style.transition=animate?'':'none';flow.style.transform=`translateX(${-page*W}px)`;if(!animate)void flow.offsetWidth;flow.style.transition='';
+  const c=chapAt(page);const inC=page-c.start+1,ofC=c.end-c.start+1;const book=Math.round(((5+(c.n-6)+inC/ofC)/12)*100);
+  $('ftr').textContent=`${inC} de ${ofC}`;$('hdr').textContent=c.n===6&&page===0||page===c.start?'A Estação das Marés':`Cap. ${c.n} · ${c.t}`;
+  $('tt').innerHTML=`<span>A Estação das Marés / </span>Cap. ${c.n}`;$('pl').textContent=`Página ${inC} de ${ofC} do capítulo`;$('bp').textContent=`${book}% do livro`;$('rg').value=page;
+  $('mark').classList.toggle('on',marks.has(page))}
+function turn(d){const np=page+d;if(np<0||np>=total){toast(np<0?'Início do trecho de exemplo':'Fim do trecho de exemplo');return}
+  hideHint();
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(anim==='folhear'&&!reduce){
+    const cl=document.createElement('div');cl.className='turn';const f=flow.cloneNode(true);f.removeAttribute('id');f.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));f.style.transition='none';
+    if(d>0){f.style.transform=`translateX(${-page*W}px)`;cl.appendChild(f);phone.appendChild(cl);page=np;show(false);
+      cl.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(-100deg)',opacity:.6}],{duration:520,easing:'cubic-bezier(.4,.1,.3,1)'}).onfinish=()=>cl.remove()}
+    else{f.style.transform=`translateX(${-np*W}px)`;cl.appendChild(f);phone.appendChild(cl);
+      cl.animate([{transform:'rotateY(-100deg)',opacity:.6},{transform:'rotateY(0deg)',opacity:1}],{duration:520,easing:'cubic-bezier(.4,.1,.3,1)'}).onfinish=()=>{page=np;show(false);cl.remove()}}
+  }else{page=np;show(anim==='deslizar'&&!reduce)}}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;phone.appendChild(e);setTimeout(()=>e.remove(),1600)}
+function hideHint(){$('hint').classList.remove('on')}
+setTimeout(hideHint,2600);
+function setChrome(v){chromeOn=v;$('chrome').classList.toggle('on',v)}
+/* toque e deslizar */
+let sx=null,sy=0;
+vp.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+vp.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;
+  if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){setChrome(false);return turn(dx<0?1:-1)}
+  const r=vp.getBoundingClientRect(),x=(e.clientX-r.left)/r.width;if(chromeOn){setChrome(false);return}
+  if(x<.25)turn(-1);else if(x>.75)turn(1);else setChrome(true)});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')turn(1);if(e.key==='ArrowLeft')turn(-1)});
+$('rg').oninput=e=>{page=+e.target.value;show(false)};
+$('mark').onclick=()=>{marks.has(page)?marks.delete(page):marks.add(page);show(false);toast(marks.has(page)?'Marcador adicionado':'Marcador removido')};
+/* folhas */
+const SH={
+ aa:()=>`<h5>Aparência da leitura</h5>
+  <div class="lbl">Cor da página</div><div class="sw">${[['white','#fbfaf7','Branca'],['old','#f0e4c6','Papel antigo'],['black','#111113','Preta']].map(c=>`<b data-pg="${c[0]}" aria-label="${c[2]}" title="${c[2]}" class="${phone.classList.contains(c[0])?'on':''}" style="background:${c[1]}"></b>`).join('')}</div>
+  <div class="lbl">Fonte</div><div class="seg"><button data-font="serif" class="${font==='serif'?'on':''}" style="font-family:var(--f-book)">Literária</button><button data-font="sans" class="${font==='sans'?'on':''}">Simples</button></div>
+  <div class="lbl">Tamanho · ${fs}</div><div class="seg"><button data-fs="-1">A−</button><button data-fs="1">A+</button></div>
+  <div class="lbl">Margens</div><div class="seg">${[[16,'Estreita'],[26,'Média'],[40,'Larga']].map(x=>`<button data-m="${x[0]}" class="${m===x[0]?'on':''}">${x[1]}</button>`).join('')}</div>
+  <div class="lbl">Entrelinhas</div><div class="seg">${[[1.45,'Junto'],[1.65,'Normal'],[1.9,'Solto']].map(x=>`<button data-lh="${x[0]}" class="${lh===x[0]?'on':''}">${x[1]}</button>`).join('')}</div>
+  <div class="lbl">Alinhamento</div><div class="seg"><button data-just="1" class="${just?'on':''}">Justificado</button><button data-just="0" class="${!just?'on':''}">À esquerda</button></div>
+  <div class="lbl">Virar página</div><div class="seg">${[['folhear','Folhear'],['deslizar','Deslizar'],['nenhuma','Sem animação']].map(x=>`<button data-anim="${x[0]}" class="${anim===x[0]?'on':''}">${x[1]}</button>`).join('')}</div>
+  <p style="font-size:12px;color:var(--muted);margin:10px 0 0">"Sem animação" é usado sozinho quando o aparelho pede menos movimento.</p>`,
+ toc:()=>{const c=chapAt(page);return `<h5>Índice · A Estação das Marés</h5><div class="toc">${[[1,'O farol aceso'],[2,'Sal nas janelas'],[3,'O leilão do porto'],[4,'A capela do cais'],[5,'O farol de Ilhéu Torto'],[6,'Noite de neblina'],[7,'A maré que não voltou'],[8,'O caderno de Dona Iracema']].map(x=>`<button data-ch="${x[0]}" class="${c.n===x[0]?'on':''}" ${x[0]<6||x[0]>7?'disabled':''}><span>${x[0]}. ${x[1]}</span><small>${x[0]===8?'sem texto':x[0]<6?'fora do exemplo':c.n===x[0]?'lendo':''}</small></button>`).join('')}</div>${marks.size?`<div class="lbl">Marcadores</div><div class="toc">${[...marks].sort((a,b)=>a-b).map(p=>`<button data-goto="${p}"><span>Cap. ${chapAt(p).n}, página ${p-chapAt(p).start+1}</span><small>ir</small></button>`).join('')}</div>`:''}`},
+};
+function sheet(k){closeSheet();phone.insertAdjacentHTML('beforeend',`<div class="shade" data-close></div><div class="sheet"><div class="grab"></div>${SH[k]()}</div>`)}
+function closeSheet(){phone.querySelectorAll('.sheet,.shade').forEach(e=>e.remove())}
+phone.addEventListener('click',e=>{const t=e.target.closest('[data-sheet],[data-close],[data-pg],[data-font],[data-fs],[data-m],[data-lh],[data-just],[data-anim],[data-ch],[data-goto],[data-toast]');if(!t)return;const d=t.dataset;
+  if(d.sheet)return sheet(d.sheet);if(d.close!==undefined)return closeSheet();if(d.toast)return toast(d.toast);
+  if(d.pg){phone.classList.remove('white','old','black');phone.classList.add(d.pg);return sheet('aa')}
+  if(d.font){font=d.font;layout(true);return sheet('aa')}
+  if(d.fs){fs=Math.min(24,Math.max(13,fs+ +d.fs));layout(true);return sheet('aa')}
+  if(d.m){m=+d.m;layout(true);return sheet('aa')}
+  if(d.lh){lh=+d.lh;layout(true);return sheet('aa')}
+  if(d.just){just=d.just==='1';layout(true);return sheet('aa')}
+  if(d.anim){anim=d.anim;return sheet('aa')}
+  if(d.ch){page=d.ch==='7'?Math.floor($('c7').offsetLeft/W):0;show(false);closeSheet();return setChrome(false)}
+  if(d.goto){page=+d.goto;show(false);closeSheet();return setChrome(false)}
+});
+new ResizeObserver(()=>layout(true)).observe(vp);
+(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>layout(true));
+layout();
+</script>

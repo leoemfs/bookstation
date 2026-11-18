@@ -31,9 +31,28 @@ têm que aparecer para as outras.
   desse tipo de app tem muitos adolescentes).
 - **Custo cresce com uso:** imagens de capa e leituras consomem o plano. Comprimir capas.
 
-## Barra de baixo
-A Biblioteca ganharia uma aba **Descobrir** (a vitrine). Para caber nas 5 ações, a Lixeira sairia da
-barra e iria para dentro da Biblioteca (menu ou filtro). Decidir na prévia.
+## Dois ambientes no mesmo app (prévia v3, 18/11/2026)
+- **Criação** (âmbar): a biblioteca pessoal. Barra: Biblioteca · Ideias · **+** · Comunidade · (a definir).
+- **Comunidade** (violeta, para saber onde se está). Barra: **Início** (volta à biblioteca de criação) ·
+  Descobrir · **Feed** (centro) · Salvos · Perfil.
+- O botão do meio na Comunidade é o **Feed**. Já estando no Feed, ele vira **+** e abre: Nova prévia,
+  Publicar capítulo, Publicar livro.
+- **Feed:** publicações de **prévia** = uma imagem com um trecho escrito pelo autor por cima (início ou
+  chamada do capítulo). Cada uma tem **curtir**, **salvar** e **Ler capítulo**.
+- **Descobrir:** capas em cartões (em alta, novos capítulos). **Salvos:** livros e prévias guardados,
+  com "continuar lendo". **Perfil:** livros publicados e seguidores.
+- Leitura com virada de página (efeito leve; no app, deslizar).
+- No app, até ser construída, a Comunidade aparece como **"Em breve"**.
+
+## Barras
+- A de **cima** fica sempre visível: é o guia do caminho ("Comunidade / Feed").
+- A de **baixo** pode se recolher ao rolar a tela (aparece de novo ao subir). Mostrado na prévia;
+  virar opção de personalização depois.
+
+## Decisão (18/11/2026)
+A comunidade **não é o foco** do app. Primeiro entra como **experiência dentro do app** (F12x): as telas das prévias P1 e P7
+funcionando com conteúdo de exemplo e "publicar" só no próprio aparelho, **sem servidor, sem contas e sem dados de outras
+pessoas** (por isso sem exigências da LGPD nessa etapa). A comunidade real (servidor, contas) fica para depois, se fizer sentido.
 
 ## Ordem sugerida
 Fica **depois** de o app de escrita estar pronto (F1 a F8). Primeiro só leitura de publicados;

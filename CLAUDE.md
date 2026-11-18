@@ -18,7 +18,13 @@ O dono, Leonardo, **não é desenvolvedor**. Responda sempre em **português sim
 1. `docs/CENTRAL.md`: situação, fases e fila aprovada.
 2. `docs/ESPECIFICACAO.md`: o que o app deve fazer (visão completa).
 3. `docs/ARQUITETURA.md`: como montar e o que reaproveitar do CP Hub.
-4. `docs/futuro/`: um documento por item (comunidade, sincronização Google, IA).
+4. `docs/futuro/`: um documento por item (comunidade, diretrizes, LGPD, sincronização Google, IA).
+
+## Método: prévia primeiro (combinado em 18/11/2026)
+- O app é **desenhado inteiro em prévias** antes de qualquer código. A prévia aprovada é a "planta" do item.
+- Só se constrói um item com a prévia dele **fechada**, para não refazer telas já construídas
+  (no CP Hub, construir em cima de construção gastou muito mais).
+- Uma prévia por área (`docs/previas/*.html`), para cada ajuste ser pequeno e barato.
 
 ## Fluxo
 anotar → especificar → prévia → aprovar → construir → testar. A cada mudança, atualizar a Central.
