@@ -29,8 +29,8 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | P1 | Navegação geral, Comunidade, Ajustes | `previas/navegacao.html` | v4 feita |
 | P2 | Criar livro + painel do livro + guia do livro | `previas/livro.html` | v1 feita |
 | P3 | Editor completo (fontes, manuscrito, Mais, `/`, sem distrações, histórico) | `previas/editor.html` | v1 feita |
-| P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | v1 feita, aguardando opinião |
-| P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | a fazer |
+| P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | v1 feita |
+| P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | v1 feita, aguardando opinião |
 | P6 | Leitor do próprio livro (páginas, ajustes de leitura) | `previas/leitor.html` | a fazer |
 | P7 | Comunidade a fundo (página do livro publicado, perfil de autor, denúncia, idade) | `previas/comunidade.html` | a fazer |
 

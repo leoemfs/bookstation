@@ -6,6 +6,7 @@
 | 18/11/2026 | P2: criar livro (2 passos), painel do livro, guia do livro | https://claude.ai/artifact/GxHg39W2rZeaJx2bJ7s7tk | `docs/previas/livro.html` | v1 aguardando opinião |
 | 18/11/2026 | P3: editor completo | https://claude.ai/artifact/E8cZSQG26QuA3BWShxnCKi | `docs/previas/editor.html` | v1 aguardando opinião |
 | 18/11/2026 | P4: capítulos, cenas e rascunhos | https://claude.ai/artifact/Fju1XY1PfuHYsenzch2r8t | `docs/previas/capitulos.html` | v1 aguardando opinião |
+| 18/11/2026 | P5: fichas | https://claude.ai/artifact/UDfj9Yo4psMvAvL6gx52qj | `docs/previas/fichas.html` | v1 aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -54,3 +55,15 @@
 - **Rascunhos:** filtro (sem capítulo, por tag), vínculo opcional ("Sem capítulo (tudo bem)"),
   **Transferir para capítulo** (escolher capítulo, no fim / no início / como nova cena, manter o original ligado por padrão), Copiar p/ IA.
 - **Estrutura:** marcos do modelo (Três atos) com capítulos ligados; o Quadro narrativo fica para a F9.
+
+## P5: fichas (v1)
+- Seletor no topo (rolagem para o lado): **Personagens · Locais · Climas · Imagens · Relações**.
+- **Personagens** agrupados (principais, secundários, participações), com "aparece em N lugares".
+- **Ficha de personagem:** foto, perguntas para pensar (opcionais), seções que abrem e fecham com contador
+  ("6 de 8"): básicas, físicas, personalidade, desenvolvimento, comunicação. Relações com tipo colorido e descrição,
+  **Aparece em** (capítulos com quantas vezes, cenas, rascunhos, ideias; toque leva ao ponto do texto), imagens, Copiar p/ IA.
+- **Local:** imagem grande, caminho dentro do universo (Mundo › Vila › Ilhéu), categoria, **5 perguntas sensoriais**
+  (vê, ouve, cheira, temperatura, sensação), história/arquitetura/cultura, ligações e "aparece em".
+- **Clima:** dois blocos separados, **Clima (o tempo)** e **Atmosfera (o sentimento)**, e onde é usado.
+- **Imagens:** galeria por categoria; ao abrir: descrição, tags, ligações e **Usar como referência ao escrever** (fica num cantinho do editor).
+- **Relações:** lista de pares com tipo; o mapa gráfico fica para a F9. Nova relação aparece nas duas fichas.
