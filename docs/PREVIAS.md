@@ -4,6 +4,7 @@
 |---|---|---|---|---|
 | 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 a v3 vistas; **v4** (mesmo link) aguardando opinião |
 | 18/11/2026 | P2: criar livro (2 passos), painel do livro, guia do livro | https://claude.ai/artifact/GxHg39W2rZeaJx2bJ7s7tk | `docs/previas/livro.html` | v1 aguardando opinião |
+| 18/11/2026 | P3: editor completo | https://claude.ai/artifact/E8cZSQG26QuA3BWShxnCKi | `docs/previas/editor.html` | v1 aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -27,3 +28,16 @@
 - **Guia do livro:** abas Identidade · Direção · Planejamento; campos opcionais com ✓ quando preenchidos e
   botão "Ajuda" com perguntas; no Planejamento, os marcos da estrutura escolhida ligados aos capítulos.
 - Título do topo: quando não cabe, encurta o nível de cima e mantém o nome da tela.
+
+## P3: o editor (v1)
+- Topo: caminho "Capítulos / Cap. 7", indicador **Salvando… / Salvo** (salva sozinho) e lupa de **busca no texto** (destaca os achados).
+- Barra de formatação em 2 linhas: estilo do parágrafo (Parágrafo, Títulos 1-3, Citação), N, I, destaque, lista;
+  sublinhado, **Aa** (aparência), **/** (inserir referência), desfazer, refazer, **Mais**.
+- **Aa:** fonte Literária ou Simples, **bloco manuscrito** só no parágrafo atual, recuo, tamanho, cor da página (branca, preta, papel antigo).
+- **Mais:** tachado, lista numerada, citação, separador (⁂), recuo, manuscrito, buscar, **histórico** (restaurar guarda a versão atual antes;
+  versões com nome), **sem distrações**, dividir em cena, copiar p/ IA, atalhos do computador.
+- **Comando /:** abre lista do livro por tipo (/personagem, /local, /clima, /objeto, /evento), filtra ao digitar, setas + Enter, "+ Criar".
+  Insere **vínculo real**: sublinhado cheio (personagem), tracejado (local), pontilhado (clima).
+- **Tocar numa referência:** resumo da ficha, "aparece em" e botões Abrir ficha / Editar.
+- **+** no editor: inserir personagem, local, clima, objeto, evento, cena, manuscrito, separador, imagem, rascunho, ideia.
+- Rodapé: palavras e caracteres ao vivo. No celular real, a barra de formatação fica presa acima do teclado.
