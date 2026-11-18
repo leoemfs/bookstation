@@ -23,6 +23,17 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | F12 | Comunidade: publicar e ler livros de outros autores (precisa de servidor) | G | anotado (`futuro/COMUNIDADE.md`) |
 | F13 | IA embutida com servidor e limite de uso (precisa de cobrança) | G | anotado (`futuro/IA.md`) |
 
+## Roteiro de prévias (antes de construir)
+| # | Área | Arquivo | Situação |
+|---|---|---|---|
+| P1 | Navegação geral, Comunidade, Ajustes | `previas/navegacao.html` | v4 feita |
+| P2 | Criar livro + painel do livro + guia do livro | `previas/livro.html` | próxima sugerida |
+| P3 | Editor completo (fontes, manuscrito, Mais, `/`, sem distrações, histórico) | `previas/editor.html` | a fazer |
+| P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | a fazer |
+| P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | a fazer |
+| P6 | Leitor do próprio livro (páginas, ajustes de leitura) | `previas/leitor.html` | a fazer |
+| P7 | Comunidade a fundo (página do livro publicado, perfil de autor, denúncia, idade) | `previas/comunidade.html` | a fazer |
+
 ## Fila aprovada
 (vazia: cada fase precisa de prévia e aprovação antes)
 
