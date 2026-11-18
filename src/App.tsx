@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { normalize, type Dados } from './data.ts';
-import { dbGet, dbSet, pedirPersistencia } from './db.ts';
+import { dbGet, dbSet, gravarEmergencia, lerEmergencia, pedirPersistencia } from './db.ts';
 import { limparLixeira } from './livros.ts';
 import { Importar } from './Importar.tsx';
 import { lerRota, type Rota } from './router.ts';
@@ -12,6 +12,10 @@ import { EmBreve } from './telas/EmBreve.tsx';
 import { Lixeira } from './telas/Lixeira.tsx';
 import { NovoLivro } from './telas/NovoLivro.tsx';
 import { Painel } from './telas/Painel.tsx';
+const Escrever = lazy(() => import('./telas/Escrever.tsx').then((m) => ({ default: m.Escrever })));
+import { novoCapitulo, semOrfaos } from './capitulos.ts';
+import { novoId } from './livros.ts';
+import { ativo as edAtivo } from './editorAtivo.ts';
 
 const CHAVE = 'dados';
 
@@ -21,16 +25,34 @@ export function App() {
   const [mais, setMais] = useState(false);
   const [some, setSome] = useState(false);
   const avisouReserva = useRef(false);
-  const mudou = useRef(false);
+  const atual = useRef<Dados | null>(null);
 
   useEffect(() => {
     dbGet<unknown>(CHAVE).then((raw) => {
-      const d = normalize(raw);
-      setDados({ ...d, livros: limparLixeira(d.livros, Date.now()) });
-    }, () => setDados(normalize(undefined)));
+      // usa a cópia mais nova: a do banco ou a de emergência (gravada ao fechar o app)
+      const banco = normalize(raw);
+      const emerg = lerEmergencia();
+      const e = emerg ? normalize(emerg) : null;
+      const d = e && e.salvoEm > banco.salvoEm ? e : banco;
+      if (d === e) dbSet(CHAVE, e);
+      const ok = { ...d, livros: limparLixeira(d.livros, Date.now()) };
+      atual.current = ok;
+      setDados(ok);
+    }, () => {
+      atual.current = normalize(undefined);
+      setDados(atual.current);
+    });
+    const aoFechar = () => { if (document.visibilityState === 'hidden' && atual.current) gravarEmergencia(atual.current); };
+    const aoSair = () => { if (atual.current) gravarEmergencia(atual.current); };
+    document.addEventListener('visibilitychange', aoFechar);
+    addEventListener('pagehide', aoSair);
     const onHash = () => { setRota(lerRota(location.hash)); setMais(false); scrollTo(0, 0); setSome(false); };
     addEventListener('hashchange', onHash);
-    return () => removeEventListener('hashchange', onHash);
+    return () => {
+      removeEventListener('hashchange', onHash);
+      document.removeEventListener('visibilitychange', aoFechar);
+      removeEventListener('pagehide', aoSair);
+    };
   }, []);
 
   // tema
@@ -58,25 +80,38 @@ export function App() {
     return () => removeEventListener('scroll', f);
   }, [recolhe]);
 
-  // grava sozinho depois de cada mudança feita pela pessoa
-  useEffect(() => {
-    if (!dados || !mudou.current) return;
-    dbSet(CHAVE, dados).then((r) => {
+  if (!dados) return null;
+
+  // Cada mudança é gravada na hora (também ao fechar o app no meio da digitação).
+  const mudar = (fn: (d: Dados) => Dados) => {
+    const d = atual.current!;
+    let n = { ...fn(d), salvoEm: Date.now() };
+    // capítulos de livros que saíram de vez também saem
+    if (n.livros !== d.livros) n = { ...n, capitulos: semOrfaos(n.capitulos, new Set(n.livros.map((l) => l.id))) };
+    atual.current = n;
+    setDados(n);
+    dbSet(CHAVE, n).then((r) => {
       if (r === 'reserva' && !avisouReserva.current) { avisouReserva.current = true; avisar('Salvo no modo reserva do navegador. Faça um backup.'); }
     }, () => avisar('Não deu para salvar. Faça um backup agora.'));
     pedirPersistencia();
-  }, [dados]);
+  };
 
-  if (!dados) return null;
-
-  const mudar = (fn: (d: Dados) => Dados) => { mudou.current = true; setDados((d) => fn(d!)); };
-
-  const noLivro = rota.tela === 'livro' || rota.tela === 'area';
+  const noLivro = rota.tela === 'livro' || rota.tela === 'area' || rota.tela === 'editor';
+  const noEditor = rota.tela === 'editor';
   const livroId = noLivro ? rota.id : '';
-  const barra: [IconName, string, Rota | null][] = noLivro
+  const barra: [IconName, string, Rota | null | (() => void)][] = noEditor
+    ? [['lista', 'Capítulos', { tela: 'area', id: livroId, area: 'capitulos' }], ['pessoa', 'Fichas', { tela: 'area', id: livroId, area: 'fichas' }], ['mais', '', null], ['copia', 'Copiar p/ IA', () => avisar('Copiar para IA chega na F3')], ['livro', 'Ler', () => avisar('A leitura chega na F8')]]
+    : noLivro
     ? [['casa', 'Painel', { tela: 'livro', id: livroId }], ['lista', 'Capítulos', { tela: 'area', id: livroId, area: 'capitulos' }], ['mais', '', null], ['pessoa', 'Fichas', { tela: 'area', id: livroId, area: 'fichas' }], ['ideia', 'Ideias', { tela: 'area', id: livroId, area: 'ideias' }]]
     : [['lib', 'Biblioteca', { tela: 'biblioteca' }], ['ideia', 'Ideias', { tela: 'ideias' }], ['mais', '', null], ['globo', 'Comunidade', { tela: 'comunidade' }], ['engrenagem', 'Ajustes', { tela: 'ajustes' }]];
-  const ativo = (r: Rota | null) => !!r && JSON.stringify(r) === JSON.stringify(rota);
+  const ativo = (r: Rota | null | (() => void)) => !!r && typeof r !== 'function' && JSON.stringify(r) === JSON.stringify(rota);
+  const novoCap = () => {
+    const id = novoId();
+    mudar((d) => ({ ...d, capitulos: [...d.capitulos, novoCapitulo(d.capitulos, livroId, Date.now(), id)] }));
+    setMais(false);
+    ir({ tela: 'editor', id: livroId, cap: id });
+  };
+  const inserir = (fn: () => void) => () => { setMais(false); setTimeout(fn, 0); };
   const breve = (fase: string) => () => { setMais(false); avisar(`Chega na fase ${fase}`); };
 
   return (
@@ -85,6 +120,7 @@ export function App() {
       {rota.tela === 'novo' && <NovoLivro />}
       {rota.tela === 'livro' && <Painel id={rota.id} key={rota.id} />}
       {rota.tela === 'area' && <EmBreve area={rota.area} livroId={rota.id} />}
+      {rota.tela === 'editor' && <Suspense fallback={null}><Escrever livroId={rota.id} capId={rota.cap} key={rota.cap} /></Suspense>}
       {rota.tela === 'lixeira' && <Lixeira />}
       {rota.tela === 'ajustes' && <Ajustes />}
       {(rota.tela === 'ideias' || rota.tela === 'comunidade') && <EmBreve area={rota.tela} />}
@@ -93,7 +129,7 @@ export function App() {
         <nav className={`tabbar${some ? ' some' : ''}`} aria-label="Navegação">
           {barra.map(([ic, nome, r]) =>
             r ? (
-              <button key={nome} className={ativo(r) ? 'on' : ''} aria-current={ativo(r) ? 'page' : undefined} onClick={() => ir(r)}>
+              <button key={nome} className={ativo(r) ? 'on' : ''} aria-current={ativo(r) ? 'page' : undefined} onClick={() => (typeof r === 'function' ? r() : ir(r))}>
                 <Icon n={ic} />{nome}
               </button>
             ) : (
@@ -104,11 +140,21 @@ export function App() {
       )}
 
       {mais && (
-        <Sheet titulo={noLivro ? `Criar em ${dados.livros.find((l) => l.id === livroId)?.titulo ?? 'livro'}` : 'Criar na Biblioteca'} onClose={() => setMais(false)}>
+        <Sheet titulo={noEditor ? 'Inserir no capítulo' : noLivro ? `Criar em ${dados.livros.find((l) => l.id === livroId)?.titulo ?? 'livro'}` : 'Criar na Biblioteca'} onClose={() => setMais(false)}>
           <div className="acts">
-            {noLivro ? (
+            {noEditor ? (
               <>
-                {([['ideia', 'Ideia rápida', 'F3'], ['lista', 'Capítulo', 'F4'], ['rascunho', 'Rascunho', 'F3'], ['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['imagem', 'Imagem', 'F5']] as [IconName, string, string][]).map(([ic, t, f]) => (
+                <button className="act" onClick={inserir(() => edAtivo.editor?.chain().focus().setHorizontalRule().run())}><span className="ic" style={{ fontSize: 18 }}>⁂</span>Separador</button>
+                <button className="act" onClick={inserir(() => edAtivo.editor?.chain().focus().toggleBlockquote().run())}><span className="ic" style={{ fontSize: 18 }}>❝</span>Citação</button>
+                <button className="act" onClick={novoCap}><span className="ic"><Icon n="lista" /></span>Novo capítulo</button>
+                {([['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['clima', 'Clima', 'F5'], ['caneta', 'Bloco manuscrito', 'F2 parte 2'], ['rascunho', 'Trazer rascunho', 'F3'], ['ideia', 'Ideia rápida', 'F3']] as [IconName, string, string][]).map(([ic, t, f]) => (
+                  <button key={t} className="act breve" onClick={breve(f)}><span className="ic"><Icon n={ic} /></span>{t}<small>em breve</small></button>
+                ))}
+              </>
+            ) : noLivro ? (
+              <>
+                <button className="act" onClick={novoCap}><span className="ic"><Icon n="lista" /></span>Capítulo</button>
+                {([['ideia', 'Ideia rápida', 'F3'], ['rascunho', 'Rascunho', 'F3'], ['pessoa', 'Personagem', 'F5'], ['local', 'Local', 'F5'], ['imagem', 'Imagem', 'F5']] as [IconName, string, string][]).map(([ic, t, f]) => (
                   <button key={t} className="act breve" onClick={breve(f)}><span className="ic"><Icon n={ic} /></span>{t}<small>em breve</small></button>
                 ))}
                 <div className="sep" />

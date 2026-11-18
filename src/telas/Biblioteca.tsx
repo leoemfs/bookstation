@@ -4,6 +4,7 @@ import { contagens, filtrar, naLixeira, ordenar, quando, type Filtro, type Ordem
 import { ir, useApp } from '../store.tsx';
 import { Topo } from '../Topo.tsx';
 import { Capa, Icon, PillSituacao } from '../ui.tsx';
+import { totais } from '../capitulos.ts';
 
 const ORDENS: { v: Ordem; l: string }[] = [
   { v: 'edicao', l: 'Última edição' },
@@ -57,7 +58,7 @@ export function Biblioteca() {
                     <h3>{l.titulo}</h3>
                     {l.generos.length > 0 && <div className="meta">{l.generos.join(' · ')}</div>}
                     {l.descricao && <div className="meta" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{l.descricao}</div>}
-                    <div className="meta" style={{ color: 'var(--faint)' }}>editado {quando(l.editadoEm, agora)} · 0 capítulos</div>
+                    <div className="meta" style={{ color: 'var(--faint)' }}>editado {quando(l.editadoEm, agora)} · {totais(dados.capitulos, l.id).capitulos} {totais(dados.capitulos, l.id).capitulos === 1 ? 'capítulo' : 'capítulos'}</div>
                     <PillSituacao s={l.situacao} livro={l} />
                   </div>
                 </button>

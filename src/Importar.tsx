@@ -28,10 +28,10 @@ export function Importar({ children, className }: { children: ReactNode; classNa
         <Sheet onClose={() => setLido(null)}>
           <div className="confirm">
             <h4>Importar “{lido.livro.titulo}”?</h4>
-            <p>O livro entra na Biblioteca. Nada do que você já tem é apagado.</p>
+            <p>O livro entra na Biblioteca com {lido.capitulos.length} {lido.capitulos.length === 1 ? 'capítulo' : 'capítulos'}. Nada do que você já tem é apagado.</p>
             <div className="row2">
               <button className="btn ghost" onClick={() => setLido(null)}>Cancelar</button>
-              <button className="btn" onClick={() => { const l = lido.livro; mudar((d) => ({ ...d, livros: juntarLivro(d.livros, l, novoId()) })); setLido(null); avisar('Livro importado'); }}>Importar</button>
+              <button className="btn" onClick={() => { const { livro: l, capitulos: cs } = lido; mudar((d) => juntarLivro(d, l, cs, novoId)); setLido(null); avisar('Livro importado'); }}>Importar</button>
             </div>
           </div>
         </Sheet>

@@ -59,6 +59,28 @@ export async function dbSet(key: string, value: unknown): Promise<'ok' | 'reserv
   return 'ok';
 }
 
+const EMERGENCIA = 'bookstation:emergencia';
+
+/** Cópia gravada na hora (síncrona) quando o app vai fechar: não depende do banco terminar a tempo. */
+export function gravarEmergencia(valor: unknown): void {
+  try {
+    localStorage.setItem(EMERGENCIA, JSON.stringify(valor));
+  } catch {
+    /* sem espaço: fica só o banco */
+  }
+}
+
+/** Lê e apaga a cópia de emergência. */
+export function lerEmergencia(): unknown {
+  try {
+    const raw = localStorage.getItem(EMERGENCIA);
+    localStorage.removeItem(EMERGENCIA);
+    return raw ? JSON.parse(raw) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Pede ao navegador para não apagar os dados sozinho quando faltar espaço. */
 export function pedirPersistencia(): void {
   try {

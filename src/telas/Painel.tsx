@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { CAPAS, GENEROS, ROTEIROS, SITUACOES, type Livro } from '../data.ts';
 import { exportarLivro, nomeArquivo } from '../backup.ts';
 import { atualizar, duplicar, novoId, paraLixeira, quando } from '../livros.ts';
+import { copiarCapitulos, doLivro, novoCapitulo, numero, ultimoEditado } from '../capitulos.ts';
+import { CAPS_TONS } from '../tons.ts';
 import { ir, useApp } from '../store.tsx';
 import { Topo } from '../Topo.tsx';
 import { avisar, baixarArquivo, Capa, comprimirImagem, Icon, PillSituacao, Sheet, type IconName } from '../ui.tsx';
 
 const AREAS: [IconName, string, string, string][] = [
-  ['lista', 'Capítulos', 'capitulos', 'chega na F4'],
+  ['lista', 'Capítulos', 'capitulos', 'lista completa na F4'],
   ['rascunho', 'Rascunhos', 'rascunhos', 'chega na F3'],
   ['pessoa', 'Personagens', 'personagens', 'chega na F5'],
   ['local', 'Locais', 'locais', 'chega na F5'],
@@ -33,6 +35,9 @@ export function Painel({ id }: { id: string }) {
   }
   const agora = Date.now();
   const roteiro = ROTEIROS.find((r) => r.v === l.roteiro)!;
+  const caps = doLivro(dados.capitulos, l.id);
+  const palavras = caps.reduce((s, c) => s + c.palavras, 0);
+  const ultimo = ultimoEditado(dados.capitulos, l.id);
   const set = (patch: Partial<Livro>) => mudar((d) => ({ ...d, livros: atualizar(d.livros, l.id, patch, Date.now()) }));
   const fechar = () => setFolha(null);
 
@@ -53,17 +58,38 @@ export function Painel({ id }: { id: string }) {
         </div>
         {l.descricao && <p className="meta" style={{ fontSize: 14, margin: '14px 2px 0' }}>{l.descricao}</p>}
 
-        <button className="card hero" style={{ marginTop: 16 }} onClick={() => ir({ tela: 'area', id: l.id, area: 'editor' })}>
-          <div className="k">Comece a escrever</div>
-          <h3>Capítulo 1</h3>
-          <div className="meta">O editor chega na próxima fase.</div>
-        </button>
+        {ultimo ? (
+          <button className="card hero" style={{ marginTop: 16 }} onClick={() => ir({ tela: 'editor', id: l.id, cap: ultimo.id })}>
+            <div className="k">Continuar escrevendo</div>
+            <h3>Cap. {numero(dados.capitulos, ultimo)}{ultimo.titulo ? ` · ${ultimo.titulo}` : ''}</h3>
+            <div className="meta">{ultimo.trecho ? `Parou em “${ultimo.trecho}”` : 'Ainda sem texto'} · {ultimo.palavras.toLocaleString('pt-BR')} palavras</div>
+          </button>
+        ) : (
+          <button className="card hero" style={{ marginTop: 16 }} onClick={() => { const cid = novoId(); mudar((d) => ({ ...d, capitulos: [...d.capitulos, novoCapitulo(d.capitulos, l.id, Date.now(), cid)] })); ir({ tela: 'editor', id: l.id, cap: cid }); }}>
+            <div className="k">Comece a escrever</div>
+            <h3>Capítulo 1</h3>
+            <div className="meta">Toque para abrir o editor. Tudo salva sozinho.</div>
+          </button>
+        )}
 
         <div className="lbl">Andamento</div>
         <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}><b>0 capítulos</b><span className="meta">0 palavras</span></div>
-          <div className="barras" />
-          <div className="meta">Quando houver capítulos, aqui aparece quantos estão planejados, em escrita, em revisão e concluídos. Serve para orientar, não para cobrar.</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}><b>{caps.length} {caps.length === 1 ? 'capítulo' : 'capítulos'}</b><span className="meta">{palavras.toLocaleString('pt-BR')} palavras</span></div>
+          <div className="barras">{caps.length > 0 && CAPS_TONS.map(([s, cor]) => { const k = caps.filter((c) => c.situacao === s).length; return k ? <i key={s} style={{ width: `${(k / caps.length) * 100}%`, background: cor }} /> : null; })}</div>
+          {caps.length > 0 ? (
+            <div className="meta" style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>{CAPS_TONS.map(([s, cor, nome]) => { const k = caps.filter((c) => c.situacao === s).length; return k ? <span key={s}><i style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: cor, marginRight: 5 }} />{k} {nome}</span> : null; })}</div>
+          ) : (
+            <div className="meta">Aqui aparece quantos capítulos estão planejados, em escrita, em revisão e concluídos. Serve para orientar, não para cobrar.</div>
+          )}
+          {caps.length > 0 && (
+            <div className="stack" style={{ gap: 0, marginTop: 10 }}>
+              {caps.map((c) => (
+                <button key={c.id} className="dica" style={{ padding: '9px 0', borderTop: '1px solid var(--border)' }} onClick={() => ir({ tela: 'editor', id: l.id, cap: c.id })}>
+                  <span className="meta" style={{ width: 22 }}>{numero(dados.capitulos, c)}</span><span>{c.titulo || 'Sem título'}</span><em>{c.palavras.toLocaleString('pt-BR')}</em>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {roteiro.marcos.length > 0 && (
@@ -95,8 +121,8 @@ export function Painel({ id }: { id: string }) {
         <Sheet titulo={l.titulo} onClose={fechar}>
           <div className="menu">
             <button onClick={() => setFolha('editar')}><span className="ic"><Icon n="caneta" /></span>Editar título, gênero e capa</button>
-            <button onClick={() => { const nid = novoId(); mudar((d) => ({ ...d, livros: duplicar(d.livros, l.id, Date.now(), nid) })); fechar(); avisar('Livro duplicado'); }}><span className="ic"><Icon n="copia" /></span>Duplicar livro</button>
-            <button onClick={() => { baixarArquivo(nomeArquivo(l.titulo, Date.now()), exportarLivro(l, Date.now())); fechar(); avisar('Arquivo do livro baixado'); }}><span className="ic"><Icon n="baixar" /></span>Exportar este livro</button>
+            <button onClick={() => { const nid = novoId(); mudar((d) => ({ ...d, livros: duplicar(d.livros, l.id, Date.now(), nid), capitulos: [...d.capitulos, ...copiarCapitulos(d.capitulos, l.id, nid, novoId, Date.now())] })); fechar(); avisar('Livro duplicado'); }}><span className="ic"><Icon n="copia" /></span>Duplicar livro</button>
+            <button onClick={() => { baixarArquivo(nomeArquivo(l.titulo, Date.now()), exportarLivro(l, dados.capitulos, Date.now())); fechar(); avisar('Arquivo do livro baixado'); }}><span className="ic"><Icon n="baixar" /></span>Exportar este livro</button>
             <button onClick={() => { set({ arquivado: !l.arquivado }); fechar(); avisar(l.arquivado ? 'Livro voltou para a Biblioteca' : 'Livro arquivado'); }}><span className="ic"><Icon n="arquivo" /></span>{l.arquivado ? 'Desarquivar' : 'Arquivar'}</button>
             <button className="danger" onClick={() => setFolha('excluir')}><span className="ic"><Icon n="lixo" /></span>Excluir</button>
           </div>

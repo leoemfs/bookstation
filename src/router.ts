@@ -5,6 +5,7 @@ export type Rota =
   | { tela: 'novo' }
   | { tela: 'livro'; id: string }
   | { tela: 'area'; id: string; area: string }
+  | { tela: 'editor'; id: string; cap: string }
   | { tela: 'lixeira' }
   | { tela: 'ajustes' }
   | { tela: 'ideias' }
@@ -13,6 +14,7 @@ export type Rota =
 export function lerRota(hash: string): Rota {
   const p = hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   if (p[0] === 'novo') return { tela: 'novo' };
+  if (p[0] === 'livro' && p[1] && p[2] === 'cap' && p[3]) return { tela: 'editor', id: p[1], cap: p[3] };
   if (p[0] === 'livro' && p[1]) return p[2] ? { tela: 'area', id: p[1], area: p[2] } : { tela: 'livro', id: p[1] };
   if (p[0] === 'lixeira' || p[0] === 'ajustes' || p[0] === 'ideias' || p[0] === 'comunidade') return { tela: p[0] };
   return { tela: 'biblioteca' };
@@ -23,6 +25,7 @@ export function hashDe(r: Rota): string {
     case 'biblioteca': return '#/';
     case 'livro': return `#/livro/${encodeURIComponent(r.id)}`;
     case 'area': return `#/livro/${encodeURIComponent(r.id)}/${encodeURIComponent(r.area)}`;
+    case 'editor': return `#/livro/${encodeURIComponent(r.id)}/cap/${encodeURIComponent(r.cap)}`;
     default: return `#/${r.tela}`;
   }
 }
@@ -30,7 +33,7 @@ export function hashDe(r: Rota): string {
 /** O nível de cima (seta ‹ do topo). */
 export function acima(r: Rota): Rota | null {
   if (r.tela === 'biblioteca') return null;
-  if (r.tela === 'area') return { tela: 'livro', id: r.id };
+  if (r.tela === 'area' || r.tela === 'editor') return { tela: 'livro', id: r.id };
   return { tela: 'biblioteca' };
 }
 

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { normalize, CAPAS } from './data.ts';
 import { exportar, exportarLivro, importar, juntarLivro, nomeArquivo } from './backup.ts';
 import { novoLivro } from './livros.ts';
+import { novoCapitulo } from './capitulos.ts';
 import { lerRota, hashDe, acima } from './router.ts';
 
 const T0 = Date.UTC(2026, 10, 18);
@@ -41,14 +42,24 @@ test('backup: arquivo errado dá mensagem clara', () => {
   assert.throws(() => importar('{"app":"bookstation","tipo":"livro","livro":{}}', T0), /incompleto/);
 });
 
-test('backup de um livro: entra sem apagar nada, com id novo se repetir', () => {
+test('backup de um livro: leva os capítulos e entra sem apagar nada', () => {
   const l = novoLivro({ titulo: 'Marés' }, T0, 'a');
-  const r = importar(exportarLivro(l, T0), T0);
+  const outro = novoLivro({ titulo: 'Outro' }, T0, 'b');
+  const caps = [novoCapitulo([], 'a', T0, 'c1', 'Abertura'), novoCapitulo([], 'b', T0, 'x1')];
+  const r = importar(exportarLivro(l, caps, T0), T0);
   assert.equal(r.tipo, 'livro');
   if (r.tipo !== 'livro') return;
-  const juntos = juntarLivro([l], r.livro, 'novo');
-  assert.deepEqual(juntos.map((x) => x.id), ['novo', 'a']);
-  assert.deepEqual(juntarLivro([], r.livro, 'novo').map((x) => x.id), ['a']);
+  assert.deepEqual(r.capitulos.map((c) => c.id), ['c1']);
+  let n = 0;
+  const d = juntarLivro(normalize({ livros: [l, outro], capitulos: caps }, T0), r.livro, r.capitulos, () => 'n' + ++n);
+  assert.deepEqual(d.livros.map((x) => x.id), ['n1', 'a', 'b']);
+  assert.deepEqual(d.capitulos.map((c) => [c.id, c.livroId, c.titulo]), [['c1', 'a', 'Abertura'], ['x1', 'b', ''], ['n2', 'n1', 'Abertura']]);
+});
+
+test('normalize: capítulo sem livro some', () => {
+  const d = normalize({ livros: [{ id: 'a' }], capitulos: [{ id: 'c', livroId: 'a' }, { id: 'd', livroId: 'zz' }, { id: 'e' }] }, T0);
+  assert.deepEqual(d.capitulos.map((c) => c.id), ['c']);
+  assert.equal(d.capitulos[0].situacao, 'escrita');
 });
 
 test('nome do arquivo de backup', () => {
@@ -56,7 +67,7 @@ test('nome do arquivo de backup', () => {
 });
 
 test('rotas: ida e volta e nível de cima', () => {
-  for (const h of ['#/', '#/novo', '#/livro/abc', '#/livro/abc/capitulos', '#/lixeira', '#/ajustes', '#/ideias', '#/comunidade']) assert.equal(hashDe(lerRota(h)), h);
+  for (const h of ['#/', '#/novo', '#/livro/abc', '#/livro/abc/capitulos', '#/livro/abc/cap/c1', '#/lixeira', '#/ajustes', '#/ideias', '#/comunidade']) assert.equal(hashDe(lerRota(h)), h);
   assert.deepEqual(lerRota(''), { tela: 'biblioteca' });
   assert.deepEqual(lerRota('#/qualquer'), { tela: 'biblioteca' });
   assert.deepEqual(acima(lerRota('#/livro/abc/guia')), { tela: 'livro', id: 'abc' });
