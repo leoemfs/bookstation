@@ -16,12 +16,17 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | F7 | Climas, imagens, cenas | M | anotado |
 | F8 | Leitor do livro (páginas, gestos; folhear depois) | G | anotado |
 | F9 | Linha do tempo, mapa de relações, continuidade, quadro | G | anotado |
+| F10 | Sincronização com a conta Google (Drive da pessoa, igual ao CP Hub) | M | anotado (`futuro/SINCRONIZACAO-GOOGLE.md`) |
+| F11 | IA: chave da própria pessoa (depois do copiar e colar da F6) | M | anotado (`futuro/IA.md`) |
+| F12 | Comunidade: publicar e ler livros de outros autores (precisa de servidor) | G | anotado (`futuro/COMUNIDADE.md`) |
+| F13 | IA embutida com servidor e limite de uso (precisa de cobrança) | G | anotado (`futuro/IA.md`) |
 
 ## Fila aprovada
 (vazia: cada fase precisa de prévia e aprovação antes)
 
 ## Caixa de entrada
-- (ideias novas entram aqui)
+- Gmail só para os apps (dono dos projetos Google Cloud, conta da IA e servidor). Um projeto Google por app.
+- Decidir: Lixeira sai da barra da Biblioteca para dar lugar a "Descobrir" (comunidade)?
 
 ## Feito
 - F0: documentação inicial e prévia geral (18/11/2026).

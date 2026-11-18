@@ -18,7 +18,7 @@ O dono, Leonardo, **não é desenvolvedor**. Responda sempre em **português sim
 1. `docs/CENTRAL.md`: situação, fases e fila aprovada.
 2. `docs/ESPECIFICACAO.md`: o que o app deve fazer (visão completa).
 3. `docs/ARQUITETURA.md`: como montar e o que reaproveitar do CP Hub.
-4. `docs/futuro/`: um documento por item quando ele for especificado.
+4. `docs/futuro/`: um documento por item (comunidade, sincronização Google, IA).
 
 ## Fluxo
 anotar → especificar → prévia → aprovar → construir → testar. A cada mudança, atualizar a Central.
