@@ -1,0 +1,273 @@
+<title>BookStation Navegação</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@7..72,500;7..72,600&family=Caveat:wght@500&display=swap">
+<style>
+/* Layout: moldura de celular centralizada; barra fixa no topo, cartões no meio, barra de 5 ações com + no centro */
+:root{
+  color-scheme:dark;
+  --bg:#08080a; --surface:#121214; --raised:#1c1c1f; --border:#2a2a2f;
+  --text:#f4f2ee; --muted:#a3a0a8; --faint:#6e6b73;
+  --accent:#e0a84a; --accent-soft:rgb(224 168 74 / .14); --on-accent:#1a1204;
+  --green:#4ade80; --blue:#60a5fa; --violet:#c4a5fd; --red:#f87171;
+  --paper-white:#fbfaf7; --paper-old:#efe3c4; --ink:#22201c;
+  --f-ui:"Inter",system-ui,sans-serif; --f-book:"Literata",Georgia,serif; --f-hand:"Caveat","Segoe Print",cursive;
+}
+body{background:#000;color:var(--text);font-family:var(--f-ui);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.note{max-width:420px;color:var(--muted);font-size:13px;line-height:1.5;text-align:center}
+.note b{color:var(--text)}
+.phone{width:100%;max-width:400px;height:780px;max-height:calc(100vh - 110px);min-height:560px;background:var(--bg);border:1px solid var(--border);border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.top{position:absolute;inset:0 0 auto;z-index:5;display:flex;align-items:center;gap:6px;padding:14px 12px 12px;background:rgb(8 8 10 / .92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.top .t{flex:1;min-width:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .t span{color:var(--muted)} .top .t b{font-weight:600}
+.ib{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:none;border:0;color:var(--text);cursor:pointer}
+.ib:hover{background:var(--raised)} .ib.back{color:var(--accent)} .ib[hidden]{display:none}
+svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.scroll{flex:1;overflow-y:auto;padding:76px 14px 110px}
+.h{font-family:var(--f-book);font-size:24px;font-weight:600;margin:4px 2px 12px;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:-6px 2px 14px}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:20px 2px 10px}
+.row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:none;padding:7px 12px;border-radius:999px;background:var(--raised);color:var(--muted);font-size:13px;border:1px solid transparent;cursor:pointer}
+.chip.on{background:var(--accent-soft);color:var(--accent);border-color:rgb(224 168 74 / .35)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:#3a3a40}
+.stack{display:flex;flex-direction:column;gap:10px}
+.book{display:flex;gap:14px}
+.cover{flex:none;width:70px;height:100px;border-radius:6px 10px 10px 6px;display:flex;align-items:flex-end;padding:8px;font-family:var(--f-book);font-size:11px;line-height:1.15;color:#fff;box-shadow:inset 6px 0 0 rgb(0 0 0 / .25)}
+.book .info{min-width:0;display:flex;flex-direction:column;gap:4px}
+.book h3{margin:0;font-family:var(--f-book);font-size:17px;font-weight:600}
+.meta{color:var(--muted);font-size:12.5px;line-height:1.45}
+.pill{align-self:flex-start;font-size:11.5px;padding:3px 9px;border-radius:999px;font-weight:500}
+.p-esc{background:rgb(74 222 128 / .13);color:var(--green)} .p-plan{background:rgb(96 165 250 / .14);color:var(--blue)} .p-rev{background:rgb(196 165 253 / .15);color:var(--violet)} .p-dev{background:var(--accent-soft);color:var(--accent)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;gap:8px;min-height:86px}
+.tile .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.tile .ic svg{width:19px;height:19px}
+.tile b{font-size:14px;font-weight:600} .tile small{color:var(--muted);font-size:12px}
+.hero{background:linear-gradient(160deg,#2a1f0e,#141216 70%);border-color:#3b2e17}
+.hero .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.hero h3{font-family:var(--f-book);margin:6px 0 4px;font-size:19px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums} .stat small{font-size:11px;color:var(--muted)}
+.chap{display:flex;gap:12px;align-items:center}
+.num{flex:none;width:34px;height:34px;border-radius:10px;background:var(--raised);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted)}
+.chap .info{flex:1;min-width:0} .chap h4{margin:0 0 2px;font-size:15px;font-weight:600}
+.drag{color:var(--faint)}
+.person{display:flex;gap:12px;align-items:center}
+.av{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-family:var(--f-book);font-size:20px;color:#fff}
+.person h4{margin:0;font-size:15px} .refs{font-size:12px;color:var(--accent);margin-top:3px}
+/* barra de baixo */
+.bar{position:absolute;inset:auto 10px 12px;z-index:8;height:64px;border-radius:22px;background:rgb(28 28 31 / .95);backdrop-filter:blur(10px);border:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
+.bar button{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-family:var(--f-ui);cursor:pointer;padding:6px 0}
+.bar button.on{color:var(--accent)}
+.bar .plus{justify-self:center;width:54px;height:54px;border-radius:18px;background:var(--accent);color:var(--on-accent);margin-top:-22px;box-shadow:0 6px 18px rgb(224 168 74 / .35);display:grid;place-items:center;padding:0}
+.bar .plus svg{width:26px;height:26px;stroke-width:2.4;transition:transform .2s}
+.bar .plus.open svg{transform:rotate(45deg)}
+/* folha do + */
+.shade{position:absolute;inset:0;z-index:6;background:rgb(0 0 0 / .55)}
+.sheet{position:absolute;inset:auto 0 0;z-index:7;background:var(--raised);border-radius:24px 24px 0 0;padding:10px 14px 96px;border-top:1px solid var(--border)}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 12px}
+.sheet h5{margin:0 4px 10px;font-size:13px;color:var(--muted);font-weight:500}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.act{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text);font-size:12px;font-family:var(--f-ui);cursor:pointer;text-align:center}
+.act .ic{color:var(--accent)}
+.sep{grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0}
+/* editor */
+.tools{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;z-index:2}
+.trow{display:flex;align-items:center;gap:4px}
+.sel{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:13.5px;color:var(--text);display:flex;justify-content:space-between}
+.tb{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:none;border:0;color:var(--text);font-weight:700;font-size:16px;cursor:pointer;font-family:var(--f-ui)}
+.tb.hl{background:#6b5517;color:#fff} .tb.more{width:auto;padding:0 8px;color:var(--muted);font-weight:500;font-size:13px;margin-left:auto}
+.paper{margin-top:10px;border-radius:14px;padding:22px 20px;font-family:var(--f-book);font-size:16.5px;line-height:1.7;transition:background .2s,color .2s}
+.paper.white{background:var(--paper-white);color:var(--ink)} .paper.old{background:var(--paper-old);color:#3a2f1c} .paper.black{background:#0e0e10;color:#e8e4dc;border:1px solid var(--border)}
+.paper h2{font-size:20px;margin:0 0 10px}
+.paper p{margin:0 0 12px}
+.ref{border-bottom:2px solid var(--accent);font-weight:600;cursor:pointer}
+.hand{font-family:var(--f-hand);font-size:22px;line-height:1.3;padding:10px 14px;border-left:3px solid currentColor;opacity:.9}
+.slash{background:var(--raised);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:6px;font-family:var(--f-ui);font-size:13px;margin:-4px 0 12px;box-shadow:0 10px 24px rgb(0 0 0 / .4)}
+.slash div{padding:8px 10px;border-radius:9px;display:flex;justify-content:space-between}
+.slash div:first-child{background:var(--accent-soft)} .slash small{color:var(--muted)}
+.foot{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px;padding:0 4px}
+.dot{color:var(--green)}
+.seg{display:flex;gap:6px;margin-top:10px}
+.seg button{flex:1;border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:10px;padding:7px 4px;font-size:12px;cursor:pointer;font-family:var(--f-ui)}
+.seg button.on{color:var(--accent);border-color:rgb(224 168 74 / .45)}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);z-index:9;background:var(--text);color:var(--bg);padding:9px 14px;border-radius:12px;font-size:13px;white-space:nowrap}
+button:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="note"><b>Prévia de navegação (exemplo, sem dados reais).</b> Toque nos cartões, nas abas da barra e no <b>+</b> do meio: as ações mudam conforme a tela.</p>
+  <div class="phone" id="phone">
+    <header class="top">
+      <button class="ib back" id="back" aria-label="Voltar" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="t" id="title"></div>
+      <button class="ib" aria-label="Pesquisar" id="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg></button>
+    </header>
+    <main class="scroll" id="main"></main>
+    <nav class="bar" id="bar"></nav>
+  </div>
+</div>
+
+<script>
+const I={
+ lib:'<path d="M4 5h4v14H4zM10 5h4v14h-4zM16.5 5.5l3.5-1 3 13.5-3.5 1z" transform="translate(-1 0)"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+ trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
+ pin:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+ pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
+ draft:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+ img:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>',
+ cloud:'<path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ scene:'<path d="M4 6h16v12H4zM4 10h16M9 6v4M15 6v4"/>',
+ link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+ ai:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
+ read:'<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',
+ hand:'<path d="M4 18c3 0 4-8 7-8s1 6 4 6 3-4 5-4"/>',
+ line:'<path d="M4 12h16"/>',
+ upload:'<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+ star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
+};
+const ic=(n)=>`<svg viewBox="0 0 24 24">${I[n]}</svg>`;
+
+const BOOK='A Estação das Marés';
+const BAR_LIB=[['lib','Biblioteca','lib'],['search','Buscar','busca'],null,['bulb','Ideias','ideiasGerais'],['trash','Lixeira','lixeira']];
+const BAR_BOOK=[['home','Painel','painel'],['list','Capítulos','capitulos'],null,['user','Fichas','fichas'],['bulb','Ideias','ideias']];
+const BAR_ED=[['list','Capítulos','capitulos'],['user','Fichas','fichas'],null,['ai','Contexto IA','ia'],['read','Ler','leitor']];
+
+const PLUS={
+ lib:{t:'Criar na Biblioteca',a:[['lib','Novo livro'],['bulb','Ideia solta'],['upload','Importar backup']]},
+ painel:{t:'Criar em '+BOOK,a:[['bulb','Ideia rápida'],['list','Capítulo'],['draft','Rascunho'],['user','Personagem'],['pin','Local'],['img','Imagem'],'sep',['star','Categorias']]},
+ capitulos:{t:'Criar em Capítulos',a:[['list','Capítulo'],['scene','Cena'],['draft','Rascunho'],'sep',['star','Categorias']]},
+ fichas:{t:'Criar em Fichas',a:[['user','Personagem'],['pin','Local'],['cloud','Clima'],['link','Relação'],['compass','Objeto ou evento'],'sep',['star','Categorias']]},
+ ideias:{t:'Captura rápida',a:[['bulb','Ideia'],['pen','Diálogo'],['scene','Possível cena']]},
+ editor:{t:'Inserir no capítulo',a:[['user','Personagem'],['pin','Local'],['cloud','Clima'],['scene','Nova cena'],['hand','Bloco manuscrito'],['line','Separador'],['img','Imagem de referência'],['draft','Trazer rascunho'],['bulb','Ideia rápida']]},
+};
+
+let stack=['lib'], plusOpen=false, paper='old';
+const $=(id)=>document.getElementById(id);
+
+const SCREENS={
+ lib:{title:()=>'<b>BookStation</b>',bar:BAR_LIB,on:'lib',plus:'lib',html:()=>`
+  <h1 class="h">Biblioteca</h1>
+  <div class="row"><span class="chip on">Todos 3</span><span class="chip">Em escrita</span><span class="chip">Planejamento</span><span class="chip">Revisão</span><span class="chip">Arquivados</span></div>
+  <div class="lbl">Ordenar: última edição</div>
+  <div class="stack">
+   ${bookCard(BOOK,'Fantasia · Mistério','Uma cidade costeira onde o mar recua um pouco a cada noite, e alguém sabe por quê.','hoje, 09:14 · 12 capítulos','Em escrita','p-esc','#1d4e5f,#0e2a33',true)}
+   ${bookCard('Cartas para Ninguém','Drama epistolar','Um carteiro aposentado encontra cartas que nunca foram entregues.','ontem · 4 capítulos','Planejamento','p-plan','#6b2e2e,#331414')}
+   ${bookCard('O Último Inverno de Vila Rosa','Romance histórico','Três gerações de uma família durante a geada de 1975.','10/11 · 21 capítulos','Em revisão','p-rev','#3c3a6b,#1b1a36')}
+  </div>`},
+ painel:{title:()=>`<span>Biblioteca / </span><b>${BOOK}</b>`,bar:BAR_BOOK,on:'painel',plus:'painel',html:()=>`
+  <div class="card hero" data-go="editor"><div class="k">Continuar escrevendo</div><h3>Cap. 7 · A maré que não voltou</h3><div class="meta">Parou em “…e o farol ficou aceso a noite inteira.” · 1.842 palavras</div></div>
+  <div class="lbl">Andamento</div>
+  <div class="stats"><div class="stat"><b>12</b><small>planejados</small></div><div class="stat"><b>6</b><small>escritos</small></div><div class="stat"><b>2</b><small>em revisão</small></div></div>
+  <div class="lbl">Áreas do livro</div>
+  <div class="grid">
+   ${tile('list','Capítulos','12 · 31 cenas','capitulos')}${tile('draft','Rascunhos','9 · 4 sem vínculo','capitulos')}
+   ${tile('bulb','Ideias','7 para organizar','ideias')}${tile('user','Personagens','14 fichas','fichas')}
+   ${tile('pin','Locais','8 fichas','fichas')}${tile('cloud','Climas','5 fichas','fichas')}
+   ${tile('img','Imagens','23 referências','fichas')}${tile('compass','Guia do livro','identidade e tom','painel')}
+  </div>`},
+ capitulos:{title:()=>`<span>${BOOK} / </span><b>Capítulos</b>`,bar:BAR_BOOK,on:'capitulos',plus:'capitulos',html:()=>`
+  <div class="row"><span class="chip on">Capítulos</span><span class="chip">Rascunhos</span><span class="chip">Estrutura</span><span class="chip">Linha do tempo</span></div>
+  <div class="lbl">Arraste para reordenar</div>
+  <div class="stack">
+   ${chap(5,'O farol de Ilhéu Torto','3 cenas · 2.410 palavras','Concluído','p-esc')}
+   ${chap(6,'Sal nas janelas','2 cenas · 1.977 palavras','Em revisão','p-rev')}
+   ${chap(7,'A maré que não voltou','4 cenas · 1.842 palavras','Em escrita','p-dev','editor')}
+   ${chap(8,'O caderno de Dona Iracema','resumo e objetivo prontos','Planejado','p-plan')}
+   ${chap(9,'Noite de neblina','sem texto ainda','Planejado','p-plan')}
+  </div>`},
+ fichas:{title:()=>`<span>${BOOK} / </span><b>Fichas</b>`,bar:BAR_BOOK,on:'fichas',plus:'fichas',html:()=>`
+  <div class="row"><span class="chip on">Personagens</span><span class="chip">Locais</span><span class="chip">Climas</span><span class="chip">Imagens</span><span class="chip">Relações</span></div>
+  <div class="lbl">Principais</div>
+  <div class="stack">
+   ${person('Iracema Duarte','Protagonista · faroleira, 64 anos','Cap. 1, 3, 5, 7 · 2 rascunhos','#8a5a1e')}
+   ${person('Tomé Aragão','Antagonista · dono do porto','Cap. 2, 6 · cena “O leilão”','#5d2f6b')}
+   ${person('Lia','Coadjuvante · neta de Iracema','Cap. 1, 7, 8','#1f6b5b')}
+  </div>
+  <div class="lbl">Secundários</div>
+  <div class="stack">${person('Padre Anselmo','Participação · capela do cais','Cap. 4','#3d4f7a')}</div>`},
+ ideias:{title:()=>`<span>${BOOK} / </span><b>Ideias</b>`,bar:BAR_BOOK,on:'ideias',plus:'ideias',html:()=>`
+  <div class="card" style="cursor:text"><div class="meta">Escreva e pronto. Organiza depois.</div><div style="margin-top:8px;color:var(--faint)">Uma frase, um diálogo, uma virada…</div></div>
+  <div class="lbl">Para organizar · 7</div>
+  <div class="stack">
+   ${idea('“O mar não leva, ele guarda.” — frase da Iracema','há 2 h')}
+   ${idea('E se o Tomé for filho do antigo faroleiro?','ontem')}
+   ${idea('Cena: Lia acha o caderno molhado debaixo do assoalho','12/11')}
+  </div>`},
+ ideiasGerais:{title:()=>`<span>Biblioteca / </span><b>Ideias soltas</b>`,bar:BAR_LIB,on:'ideiasGerais',plus:'lib',html:()=>`
+  <div class="sub">Ideias que ainda não têm livro.</div>
+  <div class="stack">${idea('Um livro contado só por listas de compras','03/11')}${idea('Cidade onde ninguém pode dizer “amanhã”','28/10')}</div>`},
+ busca:{title:()=>`<span>Biblioteca / </span><b>Buscar</b>`,bar:BAR_LIB,on:'busca',plus:'lib',html:()=>`<div class="card" style="cursor:text;color:var(--faint)">Buscar em livros, capítulos, fichas…</div><div class="lbl">Recentes</div><div class="row"><span class="chip">Iracema</span><span class="chip">farol</span><span class="chip">neblina</span></div>`},
+ lixeira:{title:()=>`<span>Biblioteca / </span><b>Lixeira</b>`,bar:BAR_LIB,on:'lixeira',plus:'lib',html:()=>`<div class="sub">Itens excluídos ficam aqui por 30 dias.</div><div class="stack">${idea('Livro: “Rascunho sem nome”','excluído em 15/11 · Recuperar')}</div>`},
+ ia:{title:()=>`<span>Cap. 7 / </span><b>Contexto para IA</b>`,bar:BAR_ED,on:'ia',plus:'editor',html:()=>`
+  <div class="sub">Junta o guia do livro e as fichas escolhidas num texto para copiar.</div>
+  <div class="lbl">Incluir</div>
+  <div class="row"><span class="chip on">Guia do livro</span><span class="chip on">Iracema</span><span class="chip on">Lia</span><span class="chip">Tomé</span><span class="chip on">Farol</span></div>
+  <div class="lbl">O que quer trabalhar?</div>
+  <div class="card" style="cursor:text;color:var(--muted)">Quero três jeitos de terminar a cena do farol sem revelar o segredo.</div>
+  <div class="lbl">Depois</div>
+  <div class="card"><b style="font-size:14px">Colar resposta como rascunho</b><div class="meta">Nunca substitui o texto do capítulo.</div></div>`},
+ leitor:{title:()=>`<span>${BOOK} / </span><b>Leitura</b>`,bar:BAR_ED,on:'leitor',plus:'editor',html:()=>`
+  <div class="paper old" style="min-height:420px"><div style="text-align:center;font-size:12px;opacity:.6;margin-bottom:18px">CAPÍTULO 7</div><h2 style="text-align:center">A maré que não voltou</h2><p>Naquela manhã o mar não voltou. Iracema contou as estacas do cais duas vezes, como quem conta os dedos depois de um susto…</p><div style="text-align:center;font-size:12px;opacity:.6;margin-top:30px">87 de 214 · 41%</div></div>
+  <div class="sub" style="margin-top:12px;text-align:center">Deslize para virar a página</div>`},
+ editor:{title:()=>`<span>Capítulos / </span><b>Cap. 7</b>`,bar:BAR_ED,on:null,plus:'editor',html:()=>`
+  <div class="tools">
+   <div class="trow"><div class="sel">Parágrafo <span>⌄</span></div><button class="tb">N</button><button class="tb" style="font-style:italic;font-weight:400">I</button><button class="tb hl">A</button><button class="tb">${ic('list')}</button></div>
+   <div class="trow"><button class="tb" style="text-decoration:underline">S</button><button class="tb" style="font-family:var(--f-book)">Aa</button><button class="tb">↶</button><button class="tb">↷</button><button class="tb more">Mais</button></div>
+  </div>
+  <div class="seg" id="paperSeg"><button data-p="white">Página branca</button><button data-p="black">Preta</button><button data-p="old">Papel antigo</button></div>
+  <div class="paper ${paper}" id="paper">
+   <h2>A maré que não voltou</h2>
+   <p>Naquela manhã o mar não voltou. <span class="ref">Iracema</span> contou as estacas do cais duas vezes, como quem conta os dedos depois de um susto.</p>
+   <p>Do alto do <span class="ref">Farol de Ilhéu Torto</span>, a <span class="ref">Lia</span> acenava com o caderno na mão.</p>
+   <div class="hand">“Vó, o mar deixou um recado na areia.”</div>
+   <p>/pers</p>
+   <div class="slash"><div>Iracema Duarte <small>personagem</small></div><div>Padre Anselmo <small>personagem</small></div><div>+ Criar personagem <small></small></div></div>
+  </div>
+  <div class="foot"><span>1.842 palavras · 10.311 caracteres</span><span><span class="dot">●</span> Salvo</span></div>`},
+};
+function bookCard(t,g,d,m,s,cls,col,main){return `<div class="card book" tabindex="0" data-go="${main?'painel':''}"><div class="cover" style="background:linear-gradient(160deg,${col})">${t}</div><div class="info"><h3>${t}</h3><div class="meta">${g}</div><div class="meta">${d}</div><div class="meta" style="color:var(--faint)">${m}</div><span class="pill ${cls}">${s}</span></div></div>`}
+function tile(i,t,s,go){return `<div class="card tile" tabindex="0" data-go="${go}"><div class="ic">${ic(i)}</div><b>${t}</b><small>${s}</small></div>`}
+function chap(n,t,m,s,cls,go){return `<div class="card chap" tabindex="0" data-go="${go||''}"><div class="num">${n}</div><div class="info"><h4>${t}</h4><div class="meta">${m}</div></div><span class="pill ${cls}">${s}</span><span class="drag">⋮⋮</span></div>`}
+function person(n,r,refs,c){return `<div class="card person" tabindex="0"><div class="av" style="background:${c}">${n[0]}</div><div style="min-width:0"><h4>${n}</h4><div class="meta">${r}</div><div class="refs">Aparece em: ${refs}</div></div></div>`}
+function idea(t,w){return `<div class="card"><div style="font-size:14.5px;line-height:1.45">${t}</div><div class="meta" style="margin-top:6px">${w}</div></div>`}
+
+function render(){
+  const k=stack[stack.length-1], s=SCREENS[k];
+  $('title').innerHTML=s.title(); $('back').hidden=stack.length<2;
+  $('main').innerHTML=s.html(); $('main').scrollTop=0;
+  $('bar').innerHTML=s.bar.map(b=>b?`<button class="${b[2]===s.on?'on':''}" data-tab="${b[2]}">${ic(b[0])}${b[1]}</button>`:`<button class="plus${plusOpen?' open':''}" id="plus" aria-label="Criar">${ic('plus')}</button>`).join('');
+  document.querySelectorAll('.sheet,.shade').forEach(e=>e.remove());
+  if(plusOpen){const p=PLUS[s.plus];$('phone').insertAdjacentHTML('beforeend',`<div class="shade" id="shade"></div><div class="sheet"><div class="grab"></div><h5>${p.t}</h5><div class="acts">${p.a.map(a=>a==='sep'?'<div class="sep"></div>':`<button class="act" data-act="${a[1]}"><span class="ic">${ic(a[0])}</span>${a[1]}</button>`).join('')}</div></div>`)}
+  const seg=$('paperSeg'); if(seg) seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.p===paper));
+}
+function go(k){ if(!k||!SCREENS[k])return; plusOpen=false; stack.push(k); render(); }
+function tab(k){ plusOpen=false; const base=SCREENS[k].bar===BAR_LIB?['lib']:['lib','painel']; stack= k==='lib'?['lib']: k==='painel'?['lib','painel']: SCREENS[stack[stack.length-1]].bar===BAR_ED&&SCREENS[k].bar===BAR_ED?[...stack.slice(0,-1),k]:[...base,k]; if(stack[stack.length-2]===k)stack.pop(); render(); }
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;$('phone').appendChild(e);setTimeout(()=>e.remove(),1600)}
+$('back').onclick=()=>{plusOpen=false;stack.pop();render()};
+$('srch').onclick=()=>toast('Busca dentro de '+(stack.length>1?BOOK:'toda a Biblioteca'));
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-go],[data-tab],#plus,#shade,[data-act],[data-p],.ref');
+  if(!t)return;
+  if(t.id==='plus'){plusOpen=!plusOpen;render();return}
+  if(t.id==='shade'){plusOpen=false;render();return}
+  if(t.dataset.act){plusOpen=false;render();toast('Abriria: '+t.dataset.act);return}
+  if(t.dataset.p){paper=t.dataset.p;$('paper').className='paper '+paper;render();return}
+  if(t.classList.contains('ref')){toast('Abre o resumo da ficha de '+t.textContent);return}
+  if(t.dataset.tab){tab(t.dataset.tab);return}
+  if(t.dataset.go)go(t.dataset.go); else if(t.closest('.card'))toast('Abriria a ficha / o item');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.go!==undefined)e.target.click()});
+render();
+</script>
