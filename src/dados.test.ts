@@ -4,6 +4,7 @@ import { normalize, CAPAS } from './data.ts';
 import { exportar, exportarLivro, importar, juntarLivro, nomeArquivo } from './backup.ts';
 import { novoLivro } from './livros.ts';
 import { novoCapitulo } from './capitulos.ts';
+import { novaIdeia, novoRascunho } from './ideias.ts';
 import { lerRota, hashDe, acima } from './router.ts';
 
 const T0 = Date.UTC(2026, 10, 18);
@@ -46,14 +47,19 @@ test('backup de um livro: leva os capítulos e entra sem apagar nada', () => {
   const l = novoLivro({ titulo: 'Marés' }, T0, 'a');
   const outro = novoLivro({ titulo: 'Outro' }, T0, 'b');
   const caps = [novoCapitulo([], 'a', T0, 'c1', 'Abertura'), novoCapitulo([], 'b', T0, 'x1')];
-  const r = importar(exportarLivro(l, caps, T0), T0);
+  const ideias = [novaIdeia('ideia', 'a', [], T0, 'i1'), novaIdeia('outra', 'b', [], T0, 'i2')];
+  const rascunhos = [novoRascunho('a', T0, 'r1', { capituloId: 'c1' })];
+  const r = importar(exportarLivro(l, { capitulos: caps, cenas: [], ideias, rascunhos }, T0), T0);
   assert.equal(r.tipo, 'livro');
   if (r.tipo !== 'livro') return;
   assert.deepEqual(r.capitulos.map((c) => c.id), ['c1']);
   let n = 0;
-  const d = juntarLivro(normalize({ livros: [l, outro], capitulos: caps }, T0), r.livro, r.capitulos, () => 'n' + ++n);
+  assert.deepEqual([r.ideias.length, r.rascunhos.length], [1, 1]);
+  const d = juntarLivro(normalize({ livros: [l, outro], capitulos: caps }, T0), r, () => 'n' + ++n);
   assert.deepEqual(d.livros.map((x) => x.id), ['n1', 'a', 'b']);
   assert.deepEqual(d.capitulos.map((c) => [c.id, c.livroId, c.titulo]), [['c1', 'a', 'Abertura'], ['x1', 'b', ''], ['n2', 'n1', 'Abertura']]);
+  assert.deepEqual(d.ideias.map((i) => i.livroId), ['n1']);
+  assert.deepEqual(d.rascunhos.map((x) => [x.livroId, x.capituloId]), [['n1', 'n2']]);
 });
 
 test('normalize: capítulo sem livro some', () => {
@@ -67,10 +73,12 @@ test('nome do arquivo de backup', () => {
 });
 
 test('rotas: ida e volta e nível de cima', () => {
-  for (const h of ['#/', '#/novo', '#/livro/abc', '#/livro/abc/capitulos', '#/livro/abc/cap/c1', '#/lixeira', '#/ajustes', '#/ideias', '#/comunidade']) assert.equal(hashDe(lerRota(h)), h);
+  for (const h of ['#/', '#/novo', '#/livro/abc', '#/livro/abc/capitulos', '#/livro/abc/cap/c1', '#/livro/abc/rascunho/r1', '#/livro/abc/ia', '#/livro/abc/ia/cap.c1', '#/livro/abc/capitulo/c1', '#/livro/abc/capitulo/c1/cena/s1', '#/lixeira', '#/ajustes', '#/ideias', '#/comunidade']) assert.equal(hashDe(lerRota(h)), h);
   assert.deepEqual(lerRota(''), { tela: 'biblioteca' });
   assert.deepEqual(lerRota('#/qualquer'), { tela: 'biblioteca' });
   assert.deepEqual(acima(lerRota('#/livro/abc/guia')), { tela: 'livro', id: 'abc' });
+  assert.deepEqual(acima(lerRota('#/livro/abc/cap/c1')), { tela: 'area', id: 'abc', area: 'capitulos' });
+  assert.deepEqual(acima(lerRota('#/livro/abc/capitulo/c1/cena/s1')), { tela: 'capitulo', id: 'abc', cap: 'c1' });
   assert.deepEqual(acima(lerRota('#/livro/abc')), { tela: 'biblioteca' });
   assert.equal(acima(lerRota('#/')), null);
 });

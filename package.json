@@ -1,7 +1,7 @@
 {
   "name": "bookstation",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.5.0",
   "type": "module",
   "description": "BookStation — organizar, planejar, escrever e acompanhar livros.",
   "scripts": {

@@ -124,7 +124,7 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
   onDigitando?: (texto: string) => void;
   aparencia: Aparencia;
   onAparencia: (a: Partial<Aparencia>) => void;
-  acoes: Acoes;
+  acoes: Partial<Acoes>;
 }) {
   const [folha, setFolha] = useState<null | 'mais' | 'aa'>(null);
   const timer = useRef<number | undefined>(undefined);
@@ -250,7 +250,7 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
               ['◻', 'Sem distrações', false, acoes.foco],
               ['⌘', 'Atalhos', false, acoes.atalhos],
               ['⇤', 'Limpar formatação', false, () => e.chain().focus().unsetAllMarks().clearNodes().updateAttributes('paragraph', { recuo: false, manuscrito: false }).run()],
-            ] as [string, string, boolean, () => void][]).map(([s, l, on, fn]) => (
+            ] as [string, string, boolean, (() => void) | undefined][]).filter((x): x is [string, string, boolean, () => void] => !!x[3]).map(([s, l, on, fn]) => (
               <button key={l} className={`act${on ? ' on' : ''}`} onMouseDown={(ev) => ev.preventDefault()} onClick={faz(fn)}>
                 <span className="ic" style={{ fontSize: 18, fontWeight: 600 }}>{s}</span>{l}
               </button>

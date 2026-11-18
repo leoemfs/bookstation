@@ -124,7 +124,7 @@ export function Escrever({ livroId, capId }: { livroId: string; capId: string })
   return (
     <>
       <Topo
-        cima={livro.titulo}
+        cima="Capítulos"
         tela={`Cap. ${n}`}
         direita={
           <>

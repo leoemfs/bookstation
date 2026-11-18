@@ -5,7 +5,7 @@ Ambiente para organizar, planejar, escrever e acompanhar livros, do primeiro rab
 Cada livro é um **pequeno universo independente**: capítulos, cenas, rascunhos, ideias, personagens,
 locais, climas, imagens e referências pertencem a uma obra e se ligam entre si, sem misturar com outras.
 
-**Situação:** versão 0.3.0 (F1 esqueleto + F2 editor completo). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
+**Situação:** versão 0.5.0 (F1 esqueleto, F2 editor, F3 ideias e rascunhos, F3b Copiar para IA, F4 capítulos, cenas e estrutura). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
 
 ## O que já funciona (F1)
 - **Biblioteca:** livros em cartões com capa, gênero, descrição, última edição e situação; filtros por situação e
@@ -43,16 +43,41 @@ locais, climas, imagens e referências pertencem a uma obra e se ligam entre si,
   versões com nome (nunca saem sozinhas), ver e restaurar (o texto de antes vira "Antes de restaurar").
 - **Sem distrações:** só a página; botão "Sair do modo foco" e contador discreto (Ctrl Shift F, Esc sai).
 - **Atalhos no computador** (Mais › Atalhos): negrito, itálico, sublinhado, tachado, títulos, buscar, histórico, foco.
+- **Teclado do celular:** a tela encolhe com o teclado (`interactive-widget=resizes-content`; nos outros navegadores as barras
+  acompanham a área visível), a barra de formatação fica presa no topo e a barra de baixo some enquanto se digita.
+
+## Ideias, rascunhos e Copiar para IA (F3 e F3b)
+- **Ideias** (caixa de entrada): no livro e soltas (Biblioteca › Ideias). Captura rápida pelo + ou no alto da tela; tags
+  (padrão: Cocriação IA, Diálogo, Cena, Reviravolta, Personagem, Lugar, Frase; e as suas); filtro por tag e arquivadas.
+  Tocar numa ideia: transformar em rascunho (a ideia é arquivada), marcar "Cocriação IA", arquivar, excluir; as soltas podem ir para um livro.
+- **Rascunhos** do livro: lista com filtro (sem capítulo, por tag); o mesmo editor dos capítulos; título, tags e capítulo ligado
+  (opcional); **Transferir para capítulo** (no fim ou no início, com separador; manter o original já vem ligado); excluir com confirmação.
+- **+ no editor:** trazer rascunho (entra onde está o cursor, o original fica) e ideia rápida.
+- **Copiar para IA** (botão na barra do editor ou no rascunho): o que copiar (este capítulo, livro inteiro, escolher capítulos,
+  o rascunho), incluir dados do livro e ideias "Cocriação IA", pedido pronto (coerência, continuidade, correção, estilo, livre),
+  copiar o texto; **colar a resposta** cria um rascunho com a tag "Cocriação IA" (nunca muda o texto original).
+- Painel: "para organizar quando quiser" (rascunhos sem capítulo, ideias); backup e exportar livro levam ideias e rascunhos.
+
+## Capítulos, cenas e estrutura (F4)
+- Abas no topo do livro: **Capítulos · Rascunhos · Estrutura**.
+- **Capítulos:** filtro por situação, totais (capítulos, cenas, palavras), cenas abrem embaixo (▾), **Reordenar** com ▲▼
+  (o número acompanha a posição), ⋯ com renomear, duplicar (com as cenas), arquivar (sai da lista e da numeração; "ver" desarquiva)
+  e excluir (vai para a lixeira por 30 dias, com as cenas).
+- **Página do capítulo:** escrever, situação (Planejado, Em escrita, Rascunho, Em revisão, Concluído), resumo, objetivo narrativo, cenas, rascunhos ligados.
+- **Cena** = cartão de planejamento dentro do capítulo (o texto fica no capítulo): título, momento, clima, resumo, modelo opcional
+  de 6 perguntas (com "esconder" e contador), subir/descer, excluir, "Escrever no capítulo".
+- **Estrutura:** modelo (Livre, Três atos, Jornada do herói, Sete pontos; trocar não apaga nada) e capítulos ligados a cada marco.
+- **Lixeira** mostra capítulos excluídos (recuperar ou excluir de vez); o editor agora fica em "Capítulos / Cap. N".
 
 ## Estrutura
 | Pasta / arquivo | O que é |
 |---|---|
 | `src/data.ts` | modelo de dados e `normalize()` (todo campo novo precisa de padrão aqui) |
-| `src/livros.ts`, `src/capitulos.ts`, `src/versoes.ts`, `src/busca.ts`, `src/backup.ts`, `src/router.ts` | regras puras, com testes em `src/*.test.ts` |
+| `src/livros.ts`, `src/capitulos.ts`, `src/versoes.ts`, `src/busca.ts`, `src/ideias.ts`, `src/ia.ts`, `src/cenas.ts`, `src/backup.ts`, `src/router.ts` | regras puras, com testes em `src/*.test.ts` |
 | `src/db.ts` | banco local (base copiada do CP Hub) |
 | `src/ui.tsx`, `src/Topo.tsx`, `src/Importar.tsx` | componentes de tela |
 | `src/Editor.tsx` | editor de texto (TipTap, base copiada do CP Hub) |
-| `src/telas/` | Biblioteca, NovoLivro, Painel, Escrever, Lixeira, Ajustes, EmBreve |
+| `src/telas/` | Biblioteca, NovoLivro, Painel, Escrever, Capitulos, CapituloTela, CenaTela, Estrutura, AbasLivro, Ideias, Rascunhos, RascunhoTela, CopiarIA, Lixeira, Ajustes, EmBreve |
 | `docs/` | Central, especificação, arquitetura, prévias |
 
 ## Comandos

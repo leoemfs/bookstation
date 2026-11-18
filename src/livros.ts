@@ -26,6 +26,7 @@ export function novoLivro(
     situacao: e.situacao ?? 'planejamento',
     roteiro: e.roteiro ?? 'livre',
     aparencia: { ...APARENCIA_PADRAO },
+    estrutura: {},
     arquivado: false,
     excluidoEm: null,
     criadoEm: agora,

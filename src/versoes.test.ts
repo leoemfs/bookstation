@@ -6,7 +6,7 @@ import type { Capitulo, Doc } from './data.ts';
 
 const T0 = Date.UTC(2026, 10, 19, 10);
 const doc = (t: string): Doc => ({ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: t }] }] });
-const cap = (t: string, extra: Partial<Capitulo> = {}): Capitulo => ({ id: 'c', livroId: 'L', ordem: 1, titulo: '', situacao: 'escrita', conteudo: doc(t), palavras: t.split(' ').length, caracteres: t.length, trecho: '', criadoEm: T0, editadoEm: T0, ...extra });
+const cap = (t: string, extra: Partial<Capitulo> = {}): Capitulo => ({ id: 'c', livroId: 'L', ordem: 1, titulo: '', situacao: 'escrita', conteudo: doc(t), palavras: t.split(' ').length, caracteres: t.length, trecho: '', resumo: '', objetivo: '', arquivado: false, excluidoEm: null, criadoEm: T0, editadoEm: T0, ...extra });
 
 test('cópia automática: só se mudou e passou meia hora', () => {
   let vs: Versao[] = [];

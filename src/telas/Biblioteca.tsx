@@ -4,7 +4,7 @@ import { contagens, filtrar, naLixeira, ordenar, quando, type Filtro, type Ordem
 import { ir, useApp } from '../store.tsx';
 import { Topo } from '../Topo.tsx';
 import { Capa, Icon, PillSituacao } from '../ui.tsx';
-import { totais } from '../capitulos.ts';
+import { capsNaLixeira, totais } from '../capitulos.ts';
 
 const ORDENS: { v: Ordem; l: string }[] = [
   { v: 'edicao', l: 'Última edição' },
@@ -19,7 +19,7 @@ export function Biblioteca() {
   const [buscando, setBuscando] = useState(false);
   const [q, setQ] = useState('');
   const c = contagens(dados.livros);
-  const lixo = naLixeira(dados.livros).length;
+  const lixo = naLixeira(dados.livros).length + capsNaLixeira(dados.capitulos).length;
   const lista = ordenar(filtrar(dados.livros, filtro, q), ordem);
   const agora = Date.now();
   const chips: { v: Filtro; l: string }[] = [{ v: 'todos', l: 'Todos' }, ...SITUACOES.filter((s) => c[s.v] > 0).map((s) => ({ v: s.v as Filtro, l: s.l })), ...(c.arquivados ? [{ v: 'arquivados' as Filtro, l: 'Arquivados' }] : [])];
