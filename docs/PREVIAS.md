@@ -2,13 +2,13 @@
 
 | Data | Prévia | Link | Arquivo | Situação |
 |---|---|---|---|---|
-| 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 a v3 vistas; **v4** (mesmo link) aguardando opinião |
-| 18/11/2026 | P2: criar livro (2 passos), painel do livro, guia do livro | https://claude.ai/artifact/GxHg39W2rZeaJx2bJ7s7tk | `docs/previas/livro.html` | v1 aguardando opinião |
-| 18/11/2026 | P3: editor completo | https://claude.ai/artifact/E8cZSQG26QuA3BWShxnCKi | `docs/previas/editor.html` | v1 aguardando opinião |
-| 18/11/2026 | P4: capítulos, cenas e rascunhos | https://claude.ai/artifact/Fju1XY1PfuHYsenzch2r8t | `docs/previas/capitulos.html` | v1 aguardando opinião |
-| 18/11/2026 | P5: fichas | https://claude.ai/artifact/UDfj9Yo4psMvAvL6gx52qj | `docs/previas/fichas.html` | v1 aguardando opinião |
-| 18/11/2026 | P6: leitor do livro | https://claude.ai/artifact/TxusD6ABSfWRdgtYYPYix6 | `docs/previas/leitor.html` | v1 aguardando opinião |
-| 18/11/2026 | P7: comunidade a fundo | https://claude.ai/artifact/GXb8ntZ49WwacRM3ZxgzzL | `docs/previas/comunidade.html` | v1 aguardando opinião |
+| 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v4 **aprovada** (18/11) |
+| 18/11/2026 | P2: criar livro (2 passos), painel do livro, guia do livro | https://claude.ai/artifact/GxHg39W2rZeaJx2bJ7s7tk | `docs/previas/livro.html` | **aprovada** (18/11) |
+| 18/11/2026 | P3: editor completo | https://claude.ai/artifact/E8cZSQG26QuA3BWShxnCKi | `docs/previas/editor.html` | **aprovada** (18/11) |
+| 18/11/2026 | P4: capítulos, cenas e rascunhos | https://claude.ai/artifact/Fju1XY1PfuHYsenzch2r8t | `docs/previas/capitulos.html` | **aprovada** (18/11) |
+| 18/11/2026 | P5: fichas | https://claude.ai/artifact/UDfj9Yo4psMvAvL6gx52qj | `docs/previas/fichas.html` | **aprovada** (18/11) |
+| 18/11/2026 | P6: leitor do livro | https://claude.ai/artifact/TxusD6ABSfWRdgtYYPYix6 | `docs/previas/leitor.html` | **aprovada** (18/11) |
+| 18/11/2026 | P7: comunidade a fundo | https://claude.ai/artifact/GXb8ntZ49WwacRM3ZxgzzL | `docs/previas/comunidade.html` | **aprovada** (18/11) |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.

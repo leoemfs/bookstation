@@ -26,16 +26,27 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 ## Roteiro de prévias (antes de construir)
 | # | Área | Arquivo | Situação |
 |---|---|---|---|
-| P1 | Navegação geral, Comunidade, Ajustes | `previas/navegacao.html` | v4 feita |
-| P2 | Criar livro + painel do livro + guia do livro | `previas/livro.html` | v1 feita |
-| P3 | Editor completo (fontes, manuscrito, Mais, `/`, sem distrações, histórico) | `previas/editor.html` | v1 feita |
-| P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | v1 feita |
-| P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | v1 feita |
-| P6 | Leitor do próprio livro (páginas, ajustes de leitura) | `previas/leitor.html` | v1 feita |
-| P7 | Comunidade a fundo (página do livro publicado, perfil de autor, denúncia, idade) | `previas/comunidade.html` | v1 feita, aguardando opinião |
+| P1 | Navegação geral, Comunidade, Ajustes | `previas/navegacao.html` | **aprovada** |
+| P2 | Criar livro + painel do livro + guia do livro | `previas/livro.html` | **aprovada** |
+| P3 | Editor completo (fontes, manuscrito, Mais, `/`, sem distrações, histórico) | `previas/editor.html` | **aprovada** |
+| P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | **aprovada** |
+| P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | **aprovada** |
+| P6 | Leitor do próprio livro (páginas, ajustes de leitura) | `previas/leitor.html` | **aprovada** |
+| P7 | Comunidade a fundo (página do livro publicado, perfil de autor, denúncia, idade) | `previas/comunidade.html` | **aprovada** |
 
-## Fila aprovada
-(vazia: cada fase precisa de prévia e aprovação antes)
+## Fila aprovada (18/11/2026: todas as prévias P1 a P7 aprovadas)
+Ordem de construção, uma fase por PR, seguindo as prévias como planta:
+1. **F1** Esqueleto: Biblioteca, criar livro, painel do livro, barras, Ajustes básicos, lixeira, backup (P1, P2) · M
+2. **F2** Editor (P3) · G, dividir em 2 PRs (texto e formatação; aparência, histórico, busca, foco)
+3. **F3 + F3b** Ideias com tags, rascunhos, Copiar para IA (P1, P4) · M
+4. **F4** Capítulos, cenas, estrutura (P4) · M
+5. **F5** Fichas e relações + comandos `/` e "aparece em" (P5, P3) · G, dividir
+6. **F6** Guia do livro completo + contexto para IA (P2) · P
+7. **F8** Leitor (P6) · M
+8. **F12x** Comunidade como **experiência dentro do app** (P1, P7) · M, **baixa prioridade**
+
+Depois (sem prévia ou precisa de servidor): F10 sincronização Google, F11 IA com chave própria, F9 linha do tempo/mapa/quadro,
+F12 comunidade real com servidor (só com F12a: diretrizes e LGPD revisadas).
 
 ## Caixa de entrada
 - Gmail só para os apps (dono dos projetos Google Cloud, conta da IA e servidor). Um projeto Google por app.
@@ -46,6 +57,7 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 - Comunidade (Publicar) e IA dentro do app aparecem como **"Em breve"**.
 - No editor, o botão de IA virou **Copiar p/ IA** (funciona sem servidor).
 - Branch `main` criado.
+- **Comunidade não é o foco.** Entra como experiência dentro do app (telas funcionando com conteúdo de exemplo, sem servidor), no fim da fila.
 - 5º botão da Criação: **Ajustes** (personalização, tema, sincronização, integrações, armazenamento, privacidade). Prévia v4.
 - Comunidade é um **segundo ambiente**: barra própria (Início · Descobrir · Feed · Salvos · Perfil), cor violeta, feed de prévias com curtir e salvar (prévia v3).
 

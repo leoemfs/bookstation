@@ -49,6 +49,11 @@ têm que aparecer para as outras.
 - A de **baixo** pode se recolher ao rolar a tela (aparece de novo ao subir). Mostrado na prévia;
   virar opção de personalização depois.
 
+## Decisão (18/11/2026)
+A comunidade **não é o foco** do app. Primeiro entra como **experiência dentro do app** (F12x): as telas das prévias P1 e P7
+funcionando com conteúdo de exemplo e "publicar" só no próprio aparelho, **sem servidor, sem contas e sem dados de outras
+pessoas** (por isso sem exigências da LGPD nessa etapa). A comunidade real (servidor, contas) fica para depois, se fizer sentido.
+
 ## Ordem sugerida
 Fica **depois** de o app de escrita estar pronto (F1 a F8). Primeiro só leitura de publicados;
 depois perfis e seguir; por último comentários.
