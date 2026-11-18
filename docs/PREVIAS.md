@@ -8,6 +8,7 @@
 | 18/11/2026 | P4: capítulos, cenas e rascunhos | https://claude.ai/artifact/Fju1XY1PfuHYsenzch2r8t | `docs/previas/capitulos.html` | v1 aguardando opinião |
 | 18/11/2026 | P5: fichas | https://claude.ai/artifact/UDfj9Yo4psMvAvL6gx52qj | `docs/previas/fichas.html` | v1 aguardando opinião |
 | 18/11/2026 | P6: leitor do livro | https://claude.ai/artifact/TxusD6ABSfWRdgtYYPYix6 | `docs/previas/leitor.html` | v1 aguardando opinião |
+| 18/11/2026 | P7: comunidade a fundo | https://claude.ai/artifact/GXb8ntZ49WwacRM3ZxgzzL | `docs/previas/comunidade.html` | v1 aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -79,3 +80,17 @@
   "página do capítulo" e "% do livro", **Editar este trecho** e Copiar p/ IA.
 - **Aa:** cor da página (branca, papel antigo, preta), fonte, tamanho, margens, entrelinhas, alinhamento, tipo de virada.
 - Sem barra de baixo do app: a leitura ocupa a tela toda.
+
+## P7: comunidade a fundo (v1)
+- **Primeira entrada:** data de nascimento. Menos de 12: sem comunidade (continua escrevendo). 12 a 17: conta protegida
+  (perfil discreto, sem 16+/18+, sem mensagens diretas, sem recomendação por anúncio). Adulto: 18+ começa desligado.
+  Aceitar Termos + Política e Diretrizes (duas marcações) para entrar.
+- **Livro publicado:** capa, autor com Seguir, **classificação + avisos de conteúdo**, gêneros, sinopse, leituras/curtidas/capítulos,
+  Continuar (onde parou) e Salvar na estante, capítulos publicados (lido, lendo, novo), prévias do livro. Comentários: depois.
+- **⋯:** copiar link, **Denunciar** (plágio, ódio/assédio, conteúdo sexual com menor, classificação errada, dados pessoais,
+  spam/golpe, outro + detalhes; quem foi denunciado não sabe quem denunciou), **Bloquear** (no perfil).
+- **Autor:** foto, bio, livros, seguidores, prévias.
+- **Publicar capítulo:** sobe uma **cópia**; capítulos já publicados, "mudou desde a publicação" (atualizar), sem texto (bloqueado);
+  classificação e avisos; "o texto é meu" (obrigatório) e "feito com IA" (selo).
+- **Meu painel:** leituras, curtidas, seguidores, **leituras por capítulo** (onde leitores param), publicações
+  (atualizar, despublicar, estatísticas), privacidade (perfil, quem sigo, 18+, bloqueados).

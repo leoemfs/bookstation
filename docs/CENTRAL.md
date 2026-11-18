@@ -31,8 +31,8 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | P3 | Editor completo (fontes, manuscrito, Mais, `/`, sem distrações, histórico) | `previas/editor.html` | v1 feita |
 | P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | v1 feita |
 | P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | v1 feita |
-| P6 | Leitor do próprio livro (páginas, ajustes de leitura) | `previas/leitor.html` | v1 feita, aguardando opinião |
-| P7 | Comunidade a fundo (página do livro publicado, perfil de autor, denúncia, idade) | `previas/comunidade.html` | a fazer |
+| P6 | Leitor do próprio livro (páginas, ajustes de leitura) | `previas/leitor.html` | v1 feita |
+| P7 | Comunidade a fundo (página do livro publicado, perfil de autor, denúncia, idade) | `previas/comunidade.html` | v1 feita, aguardando opinião |
 
 ## Fila aprovada
 (vazia: cada fase precisa de prévia e aprovação antes)
