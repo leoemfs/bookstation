@@ -7,7 +7,7 @@ F1 construída (v0.1.0, 18/11/2026). Próxima da fila: **F2 Editor** (parte 1).
 | # | Item | Tamanho | Situação |
 |---|---|---|---|
 | F0 | Documentação e prévia geral | P | **Feito** (18/11) |
-| F1 | Esqueleto: Biblioteca, painel do livro, barras, lixeira, backup | M | **feito** (v0.1.0, PR #1) |
+| F1 | Esqueleto: Biblioteca, painel do livro, barras, lixeira, backup | M | **feito** (v0.1.0, PR #2) |
 | F2 | Capítulos + editor (fontes, cor da página, autosave, contador) | G | anotado |
 | F3 | Rascunhos + caixa de ideias (captura rápida, transferir, **tags**, incluindo a tag "Cocriação IA") | M | anotado |
 | F3b | **Copiar para IA**: texto simples (capítulo, vários ou livro + guia + fichas + pedido pronto de coerência) para colar no chat da IA | P | anotado (prévia v2) |
@@ -63,4 +63,4 @@ F12 comunidade real com servidor (só com F12a: diretrizes e LGPD revisadas).
 
 ## Feito
 - F0: documentação inicial e prévia geral (18/11/2026).
-- F1: esqueleto do app, v0.1.0 (18/11/2026), PR #1. Para publicar: GitHub › Settings › Pages › Source: **GitHub Actions** (uma vez só).
+- F1: esqueleto do app, v0.1.0 (18/11/2026), PR #2. Para publicar: GitHub › Settings › Pages › Source: **GitHub Actions** (uma vez só).
