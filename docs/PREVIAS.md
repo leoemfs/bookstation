@@ -3,6 +3,7 @@
 | Data | Prévia | Link | Arquivo | Situação |
 |---|---|---|---|---|
 | 18/11/2026 | Navegação geral (Biblioteca, painel, capítulos, fichas, ideias, editor, contexto IA, leitura) | https://claude.ai/artifact/9Gdh32VLnRwumAfqb8cT9J | `docs/previas/navegacao.html` | v1 a v3 vistas; **v4** (mesmo link) aguardando opinião |
+| 18/11/2026 | P2: criar livro (2 passos), painel do livro, guia do livro | https://claude.ai/artifact/GxHg39W2rZeaJx2bJ7s7tk | `docs/previas/livro.html` | v1 aguardando opinião |
 
 ## Decisões mostradas na prévia
 - Barra fixa no topo: ‹ voltar, título em dois níveis ("Livro / Tela"), busca.
@@ -16,3 +17,13 @@
 - v2: ideias com tags ("Cocriação IA" em destaque) e filtro por tag; tela Copiar para IA com pedido pronto e texto para colar; telas "Em breve".
 - v3: dois ambientes. Botão Comunidade na Biblioteca troca a barra (Início · Descobrir · Feed · Salvos · Perfil) e a cor; feed de prévias (imagem + trecho, curtir, salvar, ler); nova prévia; leitura com virada de página; barra de baixo se recolhe ao rolar.
 - v4: 5º botão da Criação = Ajustes (personalização com recolher a barra, tema, sincronização Google, integrações, armazenamento e backup, privacidade: política, termos, diretrizes, baixar dados, excluir conta).
+
+## P2: o livro (v1)
+- **Criar livro em 2 passos:** (1) título, gênero, capa (cores prontas ou imagem), situação; (2) roteiro opcional
+  (Livre, Três atos, Jornada do herói, Sete pontos) e o que já criar (capítulo 1, perguntas na caixa de ideias).
+- **Painel:** capa e situação (toque para trocar), ⋯ com editar, duplicar, exportar, arquivar, excluir
+  (confirmação: vai para a lixeira por 30 dias). Continuar escrevendo, andamento em barra colorida por
+  situação, "para organizar quando quiser" (sem cobrança), áreas do livro (incluindo Bíblia do universo), últimas alterações.
+- **Guia do livro:** abas Identidade · Direção · Planejamento; campos opcionais com ✓ quando preenchidos e
+  botão "Ajuda" com perguntas; no Planejamento, os marcos da estrutura escolhida ligados aos capítulos.
+- Título do topo: quando não cabe, encurta o nível de cima e mantém o nome da tela.

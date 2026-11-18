@@ -27,7 +27,7 @@ Fase 0: ideia documentada em 18/11/2026. Sem código. Prévia da navegação em 
 | # | Área | Arquivo | Situação |
 |---|---|---|---|
 | P1 | Navegação geral, Comunidade, Ajustes | `previas/navegacao.html` | v4 feita |
-| P2 | Criar livro + painel do livro + guia do livro | `previas/livro.html` | próxima sugerida |
+| P2 | Criar livro + painel do livro + guia do livro | `previas/livro.html` | v1 feita, aguardando opinião |
 | P3 | Editor completo (fontes, manuscrito, Mais, `/`, sem distrações, histórico) | `previas/editor.html` | a fazer |
 | P4 | Capítulos, cenas e rascunhos (reordenar, vincular, transferir) | `previas/capitulos.html` | a fazer |
 | P5 | Fichas: personagem, local, clima, imagens, relações, "aparece em" | `previas/fichas.html` | a fazer |
