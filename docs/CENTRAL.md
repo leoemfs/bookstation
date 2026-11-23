@@ -1,7 +1,7 @@
 # Central do BookStation
 
 ## Situação
-F4 construída (v0.5.0, 19/11/2026). Próxima da fila: **F5** (fichas, relações, comandos / e "aparece em").
+F4 construída (v0.5.0, 19/11/2026); editor com faixa no teclado (v0.5.1, 23/11). Próxima da fila: **F5** (fichas, relações, comandos / e "aparece em").
 
 ## Fases sugeridas (cada uma é um item; tamanho P/M/G)
 | # | Item | Tamanho | Situação |
@@ -70,3 +70,4 @@ F12 comunidade real com servidor (só com F12a: diretrizes e LGPD revisadas).
 - F3 + F3b: ideias com tags, ideias soltas, rascunhos, transferir, trazer rascunho, Copiar para IA e colar resposta, v0.4.0 (19/11/2026).
 - F4: lista de capítulos (filtro, reordenar, duplicar, arquivar, lixeira), página do capítulo, cenas (planejamento), estrutura por marcos, v0.5.0 (19/11/2026).
   Decisão: a cena é planejamento; o texto continua no capítulo (dá para dar texto próprio à cena depois).
+- Editor igual ao do CP Hub no celular: faixa de formatação colada em cima do teclado, com Pronto, v0.5.1 (23/11/2026).

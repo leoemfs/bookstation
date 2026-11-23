@@ -10,6 +10,9 @@ import '@fontsource/literata/600.css';
 import '@fontsource/caveat/500.css';
 import './styles.css';
 import { App } from './App.tsx';
+import { iniciarTeclado } from './teclado.ts';
+
+iniciarTeclado();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

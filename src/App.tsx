@@ -82,25 +82,6 @@ export function App() {
     return () => mq.removeEventListener('change', aplicar);
   }, [tema]);
 
-  // Teclado do celular: barras acompanham a área visível; a barra de baixo sai enquanto digita.
-  useEffect(() => {
-    const vv = window.visualViewport;
-    const ajustar = () => document.documentElement.style.setProperty('--vv', `${Math.max(0, vv?.offsetTop ?? 0)}px`);
-    vv?.addEventListener('resize', ajustar);
-    vv?.addEventListener('scroll', ajustar);
-    const editavel = (el: EventTarget | null) => el instanceof HTMLElement && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'file', 'range'].includes((el as HTMLInputElement).type)));
-    const entrou = (e: FocusEvent) => { if (editavel(e.target) && matchMedia('(pointer: coarse)').matches) document.body.classList.add('digitando'); };
-    const saiu = () => setTimeout(() => { if (!editavel(document.activeElement)) document.body.classList.remove('digitando'); }, 50);
-    addEventListener('focusin', entrou);
-    addEventListener('focusout', saiu);
-    return () => {
-      vv?.removeEventListener('resize', ajustar);
-      vv?.removeEventListener('scroll', ajustar);
-      removeEventListener('focusin', entrou);
-      removeEventListener('focusout', saiu);
-    };
-  }, []);
-
   // barra de baixo some ao rolar para baixo e volta ao subir
   const recolhe = dados?.ajustes.barraRecolhe ?? true;
   useEffect(() => {

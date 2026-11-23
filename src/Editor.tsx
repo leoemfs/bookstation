@@ -116,6 +116,27 @@ export const CORES_PAGINA: { v: CorPagina; l: string; cor: string }[] = [
   { v: 'papel', l: 'Papel antigo', cor: '#efe3c4' },
 ];
 
+/**
+ * No celular, a faixa de formatação fica colada em cima do teclado. Se a linha do cursor ficar
+ * atrás dela (ou do teclado), a página rola o suficiente para o cursor aparecer logo acima da faixa. (Copiado do CP Hub.)
+ */
+function cursorVisivel(e: Editor) {
+  requestAnimationFrame(() => {
+    if (e.isDestroyed) return;
+    const barra = e.view.dom.closest('.ed')?.querySelector('.ed-barra') as HTMLElement | null;
+    if (!barra || getComputedStyle(barra).position !== 'fixed') return;
+    let c: { top: number; bottom: number };
+    try {
+      c = e.view.coordsAtPos(e.state.selection.head);
+    } catch {
+      return;
+    }
+    const limite = barra.getBoundingClientRect().top - 16;
+    if (c.bottom > limite) window.scrollBy({ top: c.bottom - limite, behavior: 'auto' });
+    else if (c.top < 76) window.scrollBy({ top: c.top - 76, behavior: 'auto' });
+  });
+}
+
 export interface Acoes { buscar: () => void; historico: () => void; foco: () => void; atalhos: () => void }
 
 export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia, acoes }: {
@@ -127,6 +148,9 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
   acoes: Partial<Acoes>;
 }) {
   const [folha, setFolha] = useState<null | 'mais' | 'aa'>(null);
+  // No celular, a faixa de formatação só aparece editando, colada em cima do teclado.
+  const [editando, setEditando] = useState(false);
+  const caixa = useRef<HTMLDivElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const ultimo = useRef(onChange);
   ultimo.current = onChange;
@@ -154,7 +178,17 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
       window.clearTimeout(timer.current);
       timer.current = window.setTimeout(salvar, 700);
     },
-    onBlur: salvar,
+    onFocus: ({ editor: e }) => {
+      setEditando(true);
+      // O teclado leva um instante para abrir: confere de novo depois.
+      window.setTimeout(() => cursorVisivel(e), 350);
+    },
+    onSelectionUpdate: ({ editor: e }) => cursorVisivel(e),
+    onBlur: () => {
+      salvar();
+      // Tocar no seletor de estilo da faixa não conta como sair do texto.
+      window.setTimeout(() => { if (!caixa.current?.querySelector('.ed-barra')?.contains(document.activeElement)) setEditando(false); }, 0);
+    },
   });
 
   useEffect(() => {
@@ -185,7 +219,7 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
   const faz = (fn: () => void) => () => { fechar(); fn(); };
 
   return (
-    <>
+    <div className={`ed${editando ? ' editing' : ''}`} ref={caixa}>
       <div className="ed-barra" role="toolbar" aria-label="Formatação">
         <div className="ed-linha">
           <select className="ed-tipo" aria-label="Estilo do parágrafo" value={blocoAtual(e)} onChange={(ev) => mudarBloco(e, ev.target.value as Bloco)}>
@@ -198,10 +232,12 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
         </div>
         <div className="ed-linha">
           <Btn label="Sublinhado" on={e.isActive('underline')} onClick={() => e.chain().focus().toggleUnderline().run()}><u>S</u></Btn>
-          <Btn label="Aparência" on={folha === 'aa'} onClick={() => setFolha('aa')}><span style={{ fontFamily: 'var(--f-book)', fontWeight: 600 }}>Aa</span></Btn>
+          <Btn label="Aparência" on={folha === 'aa'} onClick={() => { e.commands.blur(); setFolha('aa'); }}><span style={{ fontFamily: 'var(--f-book)', fontWeight: 600 }}>Aa</span></Btn>
           <Btn label="Desfazer" disabled={!e.can().undo()} onClick={() => e.chain().focus().undo().run()}><span className="ed-txt">↶</span></Btn>
           <Btn label="Refazer" disabled={!e.can().redo()} onClick={() => e.chain().focus().redo().run()}><span className="ed-txt">↷</span></Btn>
-          <Btn label="Mais ferramentas" className="ed-mais" onClick={() => setFolha('mais')}><span className="ed-txt">Mais</span></Btn>
+          <Btn label="Mais ferramentas" className="ed-mais" onClick={() => { e.commands.blur(); setFolha('mais'); }}><span className="ed-txt">Mais</span></Btn>
+          {/* Só no celular, com a faixa colada no teclado: fecha o teclado. */}
+          <Btn label="Pronto" className="ed-pronto" onClick={() => { e.commands.blur(); (document.activeElement as HTMLElement | null)?.blur(); setEditando(false); }}><span className="ed-txt">Pronto</span></Btn>
         </div>
       </div>
       <EditorContent editor={e} />
@@ -258,6 +294,6 @@ export function EditorTexto({ doc, onChange, onDigitando, aparencia, onAparencia
           </div>
         </Sheet>
       )}
-    </>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ Ambiente para organizar, planejar, escrever e acompanhar livros, do primeiro rab
 Cada livro é um **pequeno universo independente**: capítulos, cenas, rascunhos, ideias, personagens,
 locais, climas, imagens e referências pertencem a uma obra e se ligam entre si, sem misturar com outras.
 
-**Situação:** versão 0.5.0 (F1 esqueleto, F2 editor, F3 ideias e rascunhos, F3b Copiar para IA, F4 capítulos, cenas e estrutura). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
+**Situação:** versão 0.5.1 (F1 esqueleto, F2 editor, F3 ideias e rascunhos, F3b Copiar para IA, F4 capítulos, cenas e estrutura). No ar em https://leoemfs.github.io/bookstation/ (atualiza sozinho ao mesclar no `main`).
 
 ## O que já funciona (F1)
 - **Biblioteca:** livros em cartões com capa, gênero, descrição, última edição e situação; filtros por situação e
@@ -43,8 +43,10 @@ locais, climas, imagens e referências pertencem a uma obra e se ligam entre si,
   versões com nome (nunca saem sozinhas), ver e restaurar (o texto de antes vira "Antes de restaurar").
 - **Sem distrações:** só a página; botão "Sair do modo foco" e contador discreto (Ctrl Shift F, Esc sai).
 - **Atalhos no computador** (Mais › Atalhos): negrito, itálico, sublinhado, tachado, títulos, buscar, histórico, foco.
-- **Teclado do celular:** a tela encolhe com o teclado (`interactive-widget=resizes-content`; nos outros navegadores as barras
-  acompanham a área visível), a barra de formatação fica presa no topo e a barra de baixo some enquanto se digita.
+- **Teclado do celular (igual ao CP Hub, `src/teclado.ts` copiado de lá):** enquanto se escreve, a barra de formatação vira
+  uma **faixa de uma linha colada em cima do teclado** (rola para o lado; **Pronto** fecha o teclado); fora da escrita ela some.
+  A página rola para o cursor nunca ficar atrás da faixa; a barra de baixo some enquanto o teclado está aberto; Aa e Mais
+  fecham o teclado antes de abrir as opções. No computador a barra continua presa no topo.
 
 ## Ideias, rascunhos e Copiar para IA (F3 e F3b)
 - **Ideias** (caixa de entrada): no livro e soltas (Biblioteca › Ideias). Captura rápida pelo + ou no alto da tela; tags

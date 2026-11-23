@@ -233,15 +233,28 @@ body.modo-foco .pagina { min-height: calc(100vh - 40px); }
 .foco-conta { position: fixed; z-index: 30; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); background: var(--bg); padding: 4px 10px; border-radius: 999px; opacity: .85; }
 .escrever.com-busca .ed-barra { top: calc(var(--top-h) + 66px); }
 
-/* ---------- teclado do celular ----------
- * --vv: quanto a área visível desceu (navegadores que não encolhem a tela com o teclado).
- * body.digitando: enquanto escreve, a barra de baixo sai para sobrar espaço. */
-.top { transform: translateY(var(--vv, 0px)); }
-.busca { transform: translateY(var(--vv, 0px)); }
-.ed-barra { top: calc(var(--top-h) + 8px + var(--vv, 0px)); }
-.escrever.com-busca .ed-barra { top: calc(var(--top-h) + 66px + var(--vv, 0px)); }
-body.digitando .tabbar { display: none; }
-body.digitando main.escrever { padding-bottom: 40vh; }
+/* ---------- teclado do celular (copiado do CP Hub, E42) ----------
+ * Digitando: a barra de baixo e o + somem. No celular, a barra de formatação só aparece editando,
+ * como uma faixa de uma linha colada em cima do teclado (rola para o lado; "Pronto" fecha o teclado). */
+body.kb-open .tabbar { display: none !important; }
+.ed-pronto { display: none !important; }
+@media (max-width: 899px) and (pointer: coarse) {
+  .ed:not(.editing) .ed-barra { display: none; }
+  .ed.editing .ed-barra {
+    position: fixed; left: 0; right: 0; top: auto; bottom: var(--kb, 0px); z-index: 40;
+    margin: 0; border: 0; border-top: 1px solid var(--border); border-radius: 0; box-shadow: none;
+    padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px));
+    flex-direction: row; gap: 4px; overflow-x: auto; scrollbar-width: none; background: var(--surface);
+  }
+  .ed.editing .ed-barra::-webkit-scrollbar { display: none; }
+  .ed.editing .ed-linha { display: contents; }
+  .ed.editing .ed-barra > * , .ed.editing .ed-linha > * { flex: none; }
+  .ed.editing .ed-tipo { flex: none; width: 128px; }
+  .ed.editing .ed-mais { margin-left: 0; }
+  .ed.editing .ed-pronto { display: grid !important; position: sticky; right: 0; margin-left: auto; width: auto; padding: 0 12px; background: var(--surface); color: var(--accent); box-shadow: -10px 0 12px var(--surface); }
+  /* Espaço no fim do texto para a faixa não cobrir a última linha. */
+  .ed.editing .ed-texto { padding-bottom: 64px; }
+}
 
 /* ---------- ideias, rascunhos, copiar para IA (F3) ---------- */
 .captura { display: flex; flex-direction: column; gap: 10px; }
